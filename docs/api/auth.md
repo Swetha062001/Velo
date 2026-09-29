@@ -134,7 +134,7 @@ Change the password. **Signs out every other device**; this device receives a fr
 
 ## Admin guard — `/admin/*`
 
-Every admin endpoint (added in Phase 10) sits behind `authenticate` + `requireRole('ADMIN')`:
+Every admin endpoint sits behind `authenticate` + `requireRole('ADMIN')`:
 
 | Caller             | Result             |
 | ------------------ | ------------------ |

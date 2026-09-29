@@ -61,7 +61,7 @@ AI in deterministic smart-search mode. Report: `npm run test:e2e:report`.
 - **keyboard** — skip link, focus trapping and Escape in dialogs, choosing a size and adding to
   the bag without a mouse.
 
-## Phase 14 QA findings (fixed)
+## QA findings (fixed)
 
 | Finding                                                                                       | Fix                                                                                     |
 | --------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |

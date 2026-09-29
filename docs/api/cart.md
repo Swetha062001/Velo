@@ -2,7 +2,7 @@
 
 The server is the only source of prices and totals. Clients send **variant ids and quantities
 only**; any other field (e.g. `price`) is stripped by validation. Carts never store prices, so the
-current catalogue price is always used — the price is frozen only when an order is placed (Phase 9).
+current catalogue price is always used — the price is frozen only when an order is placed.
 
 ## Rules
 

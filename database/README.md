@@ -34,14 +34,16 @@ psql -d postgres -c "select version();"
 psql -d postgres -c "CREATE ROLE velo WITH LOGIN PASSWORD 'velo_dev_password';"
 psql -d postgres -c "CREATE DATABASE velo_dev OWNER velo;"
 psql -d postgres -c "CREATE DATABASE velo_test OWNER velo;"
+psql -d postgres -c "CREATE DATABASE velo_e2e OWNER velo;"
 ```
 
-| Database    | Used by                                                    |
-| ----------- | ---------------------------------------------------------- |
-| `velo_dev`  | The app during local development                           |
-| `velo_test` | The automated test suite (rebuilt on every `npm test` run) |
+| Database    | Used by                                                               |
+| ----------- | --------------------------------------------------------------------- |
+| `velo_dev`  | The app during local development                                      |
+| `velo_test` | The automated test suite (rebuilt on every `npm test` run)            |
+| `velo_e2e`  | End-to-end browser tests (reset + seeded on every `npm run test:e2e`) |
 
-`velo` is a regular (non-superuser) role that owns only these two databases.
+`velo` is a regular (non-superuser) role that owns only these databases; it cannot create new ones.
 `velo_dev_password` is a **development-only** password.
 
 ## 3. Environment variables

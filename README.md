@@ -1,258 +1,127 @@
 # VELO
 
-AI-powered full-stack ecommerce platform for a fictional premium sneaker brand.
+**A premium sneaker store with an AI shopping assistant**: a full-stack ecommerce platform
+with a storefront, admin, REST API and PostgreSQL, running entirely on your machine.
 
-> **Status:** Phase 11 — image uploads. This README grows with each phase; the complete
-> version (API overview, AI architecture, testing, troubleshooting) lands in Phase 15.
+![VELO storefront](docs/screenshots/home.jpg)
 
-## Technology stack
+<table>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/assistant.jpg" alt="AI assistant recommending real products within a budget" /></td>
+    <td width="50%"><img src="docs/screenshots/admin-dashboard.jpg" alt="Admin dashboard with revenue chart and low-stock alerts" /></td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/product-dark.jpg" alt="Product page in dark mode" /></td>
+    <td><img src="docs/screenshots/checkout.jpg" alt="Checkout review step" /></td>
+  </tr>
+</table>
 
-| Layer    | Tech                                                                                                             |
-| -------- | ---------------------------------------------------------------------------------------------------------------- |
-| Client   | React 19, TypeScript, Vite, Tailwind CSS v4, React Router, TanStack Query, Zustand, React Hook Form, Zod, Lucide |
-| Server   | Node.js, Express 5, TypeScript, Zod, Helmet, CORS, express-rate-limit, jsonwebtoken, cookie-parser               |
-| Database | PostgreSQL 13+ (local), node-postgres (`pg`), plain SQL migrations, bcryptjs                                     |
-| Tooling  | npm workspaces, ESLint (flat config), Prettier, tsx, concurrently, Vitest, Supertest                             |
+## Features
 
-## Prerequisites
+**Storefront.** A catalogue with filters, full-text search and facets; product pages with
+colourways and UK sizes; a wishlist; a bag with a free-shipping progress bar; four-step checkout
+(payment is simulated); order history with cancellation; light, dark and system themes.
 
-- **Node.js ≥ 22.22** (developed on Node 26) and npm ≥ 10
-- **PostgreSQL 13+** running locally (developed on 18) — see [`database/README.md`](database/README.md)
+**AI shopping assistant.** Describe what you want, for example _"gym shoes for my sister around
+6k"_, then _"any cheaper?"_, and get real catalogue products with reasons. It runs on a **free,
+open model on your laptop** (Ollama), and works without one in smart-search mode. The model can
+only choose from products the server retrieved, and every sentence it writes is fact-checked.
 
-## Installation
+**Admin.** A revenue dashboard; a product editor with drag-and-drop image upload, sizes, SKUs and
+stock; categories; inventory alerts; order fulfilment with enforced status transitions; user
+roles.
+
+**Built to be trusted.** The server owns every price, total and stock decision. Checkout is one
+database transaction with idempotency and row locking. Sessions use httpOnly cookies. The whole
+app meets WCAG AA contrast, is keyboard-accessible and works at phone size.
+
+## Tech stack
+
+| Layer    | Technology                                                                                                  |
+| -------- | ----------------------------------------------------------------------------------------------------------- |
+| Client   | React 19, TypeScript, Vite, Tailwind CSS v4, React Router, TanStack Query, Zustand, React Hook Form, Zod    |
+| Server   | Node.js, Express 5, TypeScript, Zod, Helmet, express-rate-limit, JWT (httpOnly cookie), bcrypt, multer      |
+| Database | PostgreSQL (raw parameterised SQL with node-postgres, plain SQL migrations)                                 |
+| AI       | Ollama with `qwen2.5:3b` (local, open), a provider abstraction (Ollama, OpenAI-compatible, rules-only mock) |
+| Quality  | Vitest, Supertest, Testing Library, Playwright, axe-core, ESLint, Prettier                                  |
+
+## Quick start
+
+Needs Node.js ≥ 22.22 and PostgreSQL ≥ 13. The full guide, with troubleshooting, is
+[docs/development/setup.md](docs/development/setup.md).
 
 ```bash
 npm install
-cp server/.env.example server/.env
-cp client/.env.example client/.env
-```
 
-## Database setup
-
-Full guide: [`database/README.md`](database/README.md). Short version:
-
-```bash
 psql -d postgres -c "CREATE ROLE velo WITH LOGIN PASSWORD 'velo_dev_password';"
-psql -d postgres -c "CREATE DATABASE velo_dev OWNER velo;"
-psql -d postgres -c "CREATE DATABASE velo_test OWNER velo;"
-npm run db:migrate
-npm run db:seed
-```
+createdb -O velo velo_dev && createdb -O velo velo_test && createdb -O velo velo_e2e
 
-Development accounts (local only — never use elsewhere):
+cp server/.env.example server/.env      # then set JWT_SECRET (openssl rand -base64 48)
+cp client/.env.example client/.env
 
-| Role  | Email              | Password         |
-| ----- | ------------------ | ---------------- |
-| Admin | `admin@velo.local` | `VeloAdmin#2026` |
-| User  | `user@velo.local`  | `VeloUser#2026`  |
-
-## Running locally
-
-```bash
+npm run db:migrate && npm run db:seed
 npm run dev
 ```
 
-| App    | URL                                 |
-| ------ | ----------------------------------- |
-| Client | http://localhost:5173               |
-| API    | http://localhost:5001/api/v1        |
-| Health | http://localhost:5001/api/v1/health |
+Open **http://localhost:5173**. The API runs at http://localhost:5001/api/v1.
 
-> **Why 5001 and not 5000?** On macOS, AirPlay Receiver (ControlCenter) listens on port 5000.
-> The port is configurable via `PORT` in `server/.env` — keep `VITE_API_BASE_URL` in sync.
+| Account  | Email              | Password         |
+| -------- | ------------------ | ---------------- |
+| Admin    | `admin@velo.local` | `VeloAdmin#2026` |
+| Customer | `user@velo.local`  | `VeloUser#2026`  |
 
-## Development commands
+These are local development accounts only. To turn on the local AI model, see
+[setup step 6](docs/development/setup.md#6-optional-local-ai-model).
 
-| Command              | What it does                                                                                    |
-| -------------------- | ----------------------------------------------------------------------------------------------- |
-| `npm run dev`        | Start client and server together (watch mode)                                                   |
-| `npm run dev:client` | Start only the Vite client                                                                      |
-| `npm run dev:server` | Start only the API                                                                              |
-| `npm run build`      | Production build of both workspaces                                                             |
-| `npm run typecheck`  | TypeScript check across both workspaces                                                         |
-| `npm run lint`       | ESLint over the whole repo                                                                      |
-| `npm test`           | API + client test suites (Vitest)                                                               |
-| `npm run test:e2e`   | End-to-end browser tests (Playwright, isolated DB) — see [testing](docs/development/testing.md) |
-| `npm run format`     | Format with Prettier                                                                            |
-| `npm run db:migrate` | Apply pending database migrations                                                               |
-| `npm run db:status`  | Show migration status                                                                           |
-| `npm run db:seed`    | Load demo data into an empty database                                                           |
-| `npm run db:reset`   | Drop, re-migrate and re-seed the dev database                                                   |
+## Commands
 
-## Environment variables
+| Command              | What it does                                                               |
+| -------------------- | -------------------------------------------------------------------------- |
+| `npm run dev`        | API and client together, in watch mode                                     |
+| `npm run build`      | Production build of both workspaces                                        |
+| `npm run typecheck`  | TypeScript check across the repo                                           |
+| `npm run lint`       | ESLint (`npm run format` runs Prettier)                                    |
+| `npm test`           | API and client test suites                                                 |
+| `npm run test:e2e`   | Browser tests on an isolated database (`test:e2e:report` opens the report) |
+| `npm run db:migrate` | Apply pending migrations (`db:status` shows them)                          |
+| `npm run db:seed`    | Load demo data into an empty database                                      |
+| `npm run db:reset`   | Drop, migrate and re-seed the development database                         |
 
-Real `.env` files are git-ignored. Only the `.env.example` files are committed.
+## Documentation
 
-### `server/.env`
-
-| Variable            | Purpose                                                                                                                   | Example                                                      | Secret  | Where to obtain                                   |
-| ------------------- | ------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ | ------- | ------------------------------------------------- |
-| `PORT`              | Port the API listens on                                                                                                   | `5001`                                                       | No      | Choose any free port                              |
-| `NODE_ENV`          | Runtime mode: `development` \| `test` \| `production`                                                                     | `development`                                                | No      | —                                                 |
-| `CORS_ORIGIN`       | Exact frontend origin allowed to call the API                                                                             | `http://localhost:5173`                                      | No      | The client dev URL                                |
-| `DATABASE_URL`      | PostgreSQL connection for the app and `db:*` commands                                                                     | `postgres://velo:velo_dev_password@localhost:5432/velo_dev`  | **Yes** | Created in [database setup](database/README.md)   |
-| `TEST_DATABASE_URL` | Separate database for tests; wiped on every test run                                                                      | `postgres://velo:velo_dev_password@localhost:5432/velo_test` | **Yes** | Created in [database setup](database/README.md)   |
-| `JWT_SECRET`        | Signs session tokens. Min 32 random characters                                                                            | output of `openssl rand -base64 48`                          | **Yes** | Generate locally; never reuse across environments |
-| `UPLOAD_DIR`        | Folder for uploaded images (relative to `server/`, or absolute). Git-ignored                                              | `uploads`                                                    | No      | Optional; defaults to `uploads`                   |
-| `PUBLIC_SERVER_URL` | Public origin of the API, used to build image URLs                                                                        | `http://localhost:5001`                                      | No      | Optional; defaults to `http://localhost:PORT`     |
-| `AI_PROVIDER`       | Assistant backend: `ollama` (local open model) \| `openai` (any OpenAI-compatible API) \| `mock` (no model, smart search) | `ollama`                                                     | No      | See [AI assistant](#ai-assistant)                 |
-| `AI_MODEL`          | Model name                                                                                                                | `qwen2.5:3b`                                                 | No      | Optional; per-provider default                    |
-| `AI_BASE_URL`       | Provider URL                                                                                                              | `http://localhost:11434`                                     | No      | Optional; per-provider default                    |
-| `AI_API_KEY`        | Key for hosted OpenAI-compatible providers (not needed for Ollama)                                                        | —                                                            | **Yes** | Provider dashboard; server-side only              |
-| `AI_TIMEOUT_MS`     | Per-call model timeout                                                                                                    | `30000`                                                      | No      | Optional; defaults to 30 s                        |
-
-The server validates these at startup and exits with a clear message if any are invalid.
-
-### `client/.env`
-
-| Variable            | Purpose             | Example                        | Secret                                                               |
-| ------------------- | ------------------- | ------------------------------ | -------------------------------------------------------------------- |
-| `VITE_API_BASE_URL` | Base URL of the API | `http://localhost:5001/api/v1` | **No — everything in the client is public. Never put secrets here.** |
-
-## Authentication
-
-- Email + password accounts; passwords hashed with **bcrypt** (cost 12).
-- Session = signed **JWT (HS256)** in an **httpOnly, SameSite=Lax** cookie named `velo_session`
-  (7 days). JavaScript can't read it, and it isn't sent on cross-site form posts.
-- Every authenticated request re-loads the user from the database, so **roles are never trusted
-  from the token or the client**. Changing the password bumps `token_version`, revoking all other
-  sessions.
-- Roles: `USER`, `ADMIN`. Authorization is enforced on the server (`authenticate`,
-  `requireRole('ADMIN')`). The client's route guards (`RequireAuth`, `RequireAdmin`,
-  `GuestOnly`) only decide what to render.
-- Sign-in failures return one generic message; failed attempts are rate-limited.
-
-API reference: [`docs/api/`](docs/api/README.md).
-
-## Cart, pricing & wishlist
-
-- **Server-calculated everything.** Clients send variant ids and quantities; the API returns line
-  prices, subtotal, shipping (free from ₹2,999, otherwise ₹99) and total. Carts never store prices.
-- **Guest bag** — signed-out shoppers' bags live in `localStorage` (ids + quantities only, via a
-  small Zustand store) and are priced with `POST /cart/quote`. On sign-in the bag is merged into
-  the account cart (`POST /cart/merge`) and cleared.
-- **Stock-aware** — every add/update is checked against inventory; lines that become sold out or
-  exceed stock are flagged and excluded from totals until fixed. Stock is reserved only at checkout.
-
-**Wishlist** — signed-in only. Hearts on product cards and pages save instantly (optimistic, rolled
-back on failure). A guest who taps a heart signs in and the product is then saved automatically.
-"Move to bag" asks for a size and uses the same stock rules as the cart.
-
-Rules live in `server/src/config/commerce.ts`; pricing logic in `server/src/modules/cart/cart.pricing.ts`.
-
-## Checkout & orders
-
-- **Steps:** Bag → Shipping (saved addresses or a new one) → Review → Payment (simulated) →
-  Confirmation. No card or UPI details are ever collected — payment is a demo.
-- **Placing an order is one database transaction:** the cart and the affected stock rows are
-  locked, every line is re-priced from the catalogue, then the order, item snapshots (name, size,
-  SKU, image, unit price) and address snapshot are written, stock is decremented and the bag is
-  cleared. Any failure rolls everything back.
-- **Safe retries:** each checkout sends an idempotency key, so a double-click or network retry
-  returns the original order instead of creating a second one.
-- **No surprise charges:** if prices change between review and payment, the order is refused and
-  the shopper sees the updated total.
-- **Last-pair races:** stock rows are locked in a fixed order, so two customers buying the last
-  unit can't both succeed (and can't deadlock).
-- **History:** orders keep the prices and address from purchase time. Customers can cancel while
-  an order is `CONFIRMED`; stock is returned and paid orders are marked refunded.
-
-## Admin
-
-`/admin` (admins only — enforced by the API, not just the UI):
-
-- **Dashboard** — revenue, orders, customers, products, orders by status, 14-day revenue chart,
-  low-stock alerts and recent orders.
-- **Images** — drag-and-drop or browse to upload JPEG/PNG/WebP (≤ 5 MB, verified by file
-  signature), or link https images. Files are stored through a `StorageProvider` interface —
-  local disk now (`server/uploads/`), swappable for S3 / Supabase Storage without code changes —
-  and deleted when no longer used.
-- **Products** — create (with images and a UK size run), edit, publish / unpublish / archive,
-  image ordering, sizes with SKU, price override, stock and low-stock level. Products that have
-  been ordered can be archived but not deleted.
-- **Categories** — create, edit, hide/show; only empty categories can be deleted.
-- **Inventory** — every size, most urgent first; filter low / out of stock; edit stock inline.
-- **Orders** — search and filter; move through Processing → Shipped → Delivered with enforced
-  transitions; cancelling restocks and refunds.
-- **Users** — order stats and role changes (admins can't change their own role).
-
-## AI assistant
-
-"Ask VELO AI" (floating button, header ✦ icon, home hero) finds pairs from a plain-English
-request — "gym shoes for my sister around 6k", then "any cheaper?". It runs on a **free, open
-model locally** through [Ollama](https://ollama.com); nothing leaves your machine.
-
-```bash
-brew install ollama
-brew services start ollama
-ollama pull qwen2.5:3b          # ~1.9 GB, one time
-```
-
-Then set `AI_PROVIDER=ollama` in `server/.env` and restart. The panel shows **Local AI ·
-qwen2.5:3b** when the model is reachable, otherwise **Smart search mode** — the same answers from
-deterministic rules, so the assistant works with no model at all (`AI_PROVIDER=mock`, the
-default). Any Ollama model can be used via `AI_MODEL` (e.g. `llama3.2:3b`, `qwen2.5:7b`).
-
-Guardrails: the model never queries the database and can only pick from products the server
-retrieved; explicit constraints (budget, colour, gender, size) come from rules, not the model;
-every pick and sentence is validated, and prices, names, images and stock always come from the
-database. Details: [`docs/api/ai.md`](docs/api/ai.md).
-
-To remove Ollama: `brew services stop ollama && brew uninstall ollama && rm -rf ~/.ollama`.
-
-## Theme
-
-All colours, fonts and radii live in **`client/src/styles/theme.css`**. Components use semantic
-utilities only — `bg-canvas`, `bg-surface`, `text-ink`, `text-ink-muted`, `border-line`,
-`bg-accent`, `bg-inverse`, `text-danger`, etc. Tailwind's default palette is intentionally reset, so
-off-brand classes such as `bg-blue-500` do not exist.
-
-**Dark mode** — choose Light, Dark or System (follows the device) in the footer; the header
-☀/☾ button flips quickly. The choice is saved per browser (`velo-theme` in localStorage) and a
-tiny script in `client/index.html` applies it before first paint, so there is no light flash.
-The dark palette lives under `:root[data-theme='dark']` in `theme.css`. `inverse` flips with the
-theme (primary buttons, selected states); `band` stays dark in both themes (footer, auth panel).
-
-Shared UI primitives live in `client/src/components/common/` — `Button` / `ButtonLink`, `Input`,
-`Badge`, `Spinner`, `Skeleton`, `EmptyState`, `ErrorState`. Build new UI from these rather than
-restyling raw elements.
-
-## Frontend architecture
-
-| Concern      | Location                                                                                                                                                                                                                                                                 |
-| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Routes       | `client/src/routes/router.tsx`; pages code-split in `storefrontPages.ts` / `adminPages.ts`; URLs in `routes/paths.ts`                                                                                                                                                    |
-| Layouts      | `client/src/layouts/` — Root, Storefront, Account, Admin                                                                                                                                                                                                                 |
-| API calls    | `client/src/lib/apiClient.ts` (fetch wrapper, cookies, typed `ApiError`)                                                                                                                                                                                                 |
-| Server state | TanStack Query — `lib/queryClient.ts`; feature calls in `services/` + `hooks/`                                                                                                                                                                                           |
-| Navigation   | `client/src/config/navigation.ts`                                                                                                                                                                                                                                        |
-| Page titles  | `<DocumentTitle>` — one per page (React 19 hoists `<title>`)                                                                                                                                                                                                             |
-| Bundles      | Only the home page ships in the first load; other pages load on demand (popular ones prefetched when idle). Vendors are split into cache-stable `vendor-react` / `vendor-query` / `vendor-forms` chunks (`vite.config.ts`); form libraries load only on pages with forms |
+| Document                                                          | Contents                                                               |
+| ----------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| [Setup guide](docs/development/setup.md)                          | Install, environment variables, local AI, troubleshooting              |
+| [Architecture](docs/architecture.md)                              | System diagram, backend layers, checkout and AI flows, frontend, theme |
+| [Security](docs/security.md)                                      | Threats, controls and the tests that prove them                        |
+| [Key decisions](docs/decisions.md)                                | Why paise, raw SQL, cookies, a local model and more                    |
+| [Testing & QA](docs/development/testing.md)                       | Test suites, databases, QA findings                                    |
+| [API reference](docs/api/README.md)                               | Every endpoint, with request and response examples                     |
+| [Database](docs/database/schema.md) · [setup](database/README.md) | Schema design, migrations, seed data                                   |
+| [Backend conventions](docs/development/backend-conventions.md)    | How modules, validation, errors and logging are structured             |
+| [Case study](docs/case-study.md)                                  | The project as a portfolio write-up                                    |
 
 ## Project structure
 
 ```
 velo/
-├── client/          React + Vite storefront and admin
-├── server/          Express API (feature modules under src/modules, tests under tests/)
-├── database/        SQL migrations + seed data
-├── docs/            Architecture and development docs
-├── eslint.config.js Shared lint config
-└── package.json     npm workspaces + root scripts
+├── client/              React storefront + admin (src/components, pages, hooks, services, store, styles)
+├── server/              Express API (src/modules/<feature>, src/middleware, tests/)
+├── database/            SQL migrations + JSON seed data
+├── e2e/                 Playwright end-to-end tests
+├── docs/                Architecture, security, API, testing, screenshots
+├── playwright.config.ts
+└── package.json         npm workspaces + root scripts
 ```
 
-Testing strategy, databases and QA findings: [`docs/development/testing.md`](docs/development/testing.md).
-Backend structure and rules (layers, responses, errors, validation, logging) are documented in
-[`docs/development/backend-conventions.md`](docs/development/backend-conventions.md). Database design: [`docs/database/schema.md`](docs/database/schema.md).
+## Scope
+
+VELO is a portfolio project that runs locally. Payments are simulated and no card or UPI data is
+collected. Hosting is intentionally out of scope.
 
 ## Image credits
 
-Demo product and category photography is loaded from [Unsplash](https://unsplash.com) under the
-[Unsplash License](https://unsplash.com/license). VELO is a fictional brand; some photos show
-real third-party products and logos and are used purely as placeholder imagery for this portfolio
-project. Replace them with original photography before any real use.
-
-## Deployment
-
-Not yet — VELO currently runs fully locally. Deployment will be documented after the local
-application is complete and tested.
+Product and category photography comes from [Unsplash](https://unsplash.com) under the
+[Unsplash License](https://unsplash.com/license). VELO is a fictional brand. Some photos show real
+third-party products and logos and are used only as placeholder imagery for this portfolio
+project; replace them with original photography before any real use.

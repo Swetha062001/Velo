@@ -96,7 +96,7 @@ changes never alter an existing order.
 | `status`     | Meaning                           |
 | ------------ | --------------------------------- |
 | `CONFIRMED`  | Placed; customer may still cancel |
-| `PROCESSING` | Being prepared (admin, Phase 10)  |
+| `PROCESSING` | Being prepared (admin)            |
 | `SHIPPED`    | On its way                        |
 | `DELIVERED`  | Delivered                         |
 | `CANCELLED`  | Cancelled; stock returned         |
