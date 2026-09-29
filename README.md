@@ -2,7 +2,7 @@
 
 AI-powered full-stack ecommerce platform for a fictional premium sneaker brand.
 
-> **Status:** Phase 8 — wishlist. This README grows with each phase; the complete
+> **Status:** Phase 9 — checkout & orders. This README grows with each phase; the complete
 > version (API overview, AI architecture, testing, troubleshooting) lands in Phase 15.
 
 ## Technology stack
@@ -133,6 +133,23 @@ back on failure). A guest who taps a heart signs in and the product is then save
 "Move to bag" asks for a size and uses the same stock rules as the cart.
 
 Rules live in `server/src/config/commerce.ts`; pricing logic in `server/src/modules/cart/cart.pricing.ts`.
+
+## Checkout & orders
+
+- **Steps:** Bag → Shipping (saved addresses or a new one) → Review → Payment (simulated) →
+  Confirmation. No card or UPI details are ever collected — payment is a demo.
+- **Placing an order is one database transaction:** the cart and the affected stock rows are
+  locked, every line is re-priced from the catalogue, then the order, item snapshots (name, size,
+  SKU, image, unit price) and address snapshot are written, stock is decremented and the bag is
+  cleared. Any failure rolls everything back.
+- **Safe retries:** each checkout sends an idempotency key, so a double-click or network retry
+  returns the original order instead of creating a second one.
+- **No surprise charges:** if prices change between review and payment, the order is refused and
+  the shopper sees the updated total.
+- **Last-pair races:** stock rows are locked in a fixed order, so two customers buying the last
+  unit can't both succeed (and can't deadlock).
+- **History:** orders keep the prices and address from purchase time. Customers can cancel while
+  an order is `CONFIRMED`; stock is returned and paid orders are marked refunded.
 
 ## Theme
 

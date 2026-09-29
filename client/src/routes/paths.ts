@@ -6,6 +6,7 @@ export const paths = {
   cart: '/cart',
   wishlist: '/wishlist',
   checkout: '/checkout',
+  checkoutSuccess: (orderNumber: string) => `/checkout/success/${orderNumber}`,
   login: '/login',
   register: '/register',
 

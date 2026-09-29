@@ -11,6 +11,7 @@ import LoginPage from '../pages/auth/LoginPage.tsx';
 import RegisterPage from '../pages/auth/RegisterPage.tsx';
 import CartPage from '../pages/cart/CartPage.tsx';
 import CheckoutPage from '../pages/checkout/CheckoutPage.tsx';
+import OrderConfirmationPage from '../pages/checkout/OrderConfirmationPage.tsx';
 import NotFoundPage from '../pages/errors/NotFoundPage.tsx';
 import RouteErrorPage from '../pages/errors/RouteErrorPage.tsx';
 import HomePage from '../pages/home/HomePage.tsx';
@@ -62,6 +63,7 @@ export const router = createBrowserRouter([
                 children: [
                   { path: 'wishlist', Component: WishlistPage },
                   { path: 'checkout', Component: CheckoutPage },
+                  { path: 'checkout/success/:orderNumber', Component: OrderConfirmationPage },
                   {
                     path: 'account',
                     Component: AccountLayout,

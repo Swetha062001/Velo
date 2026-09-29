@@ -187,7 +187,7 @@ export async function seed(pool: Pool): Promise<SeedSummary> {
       [
         userId,
         'Demo Customer',
-        '+91 90000 00000',
+        '+91 9000000000',
         '221 Example Residency, 4th Cross',
         'Indiranagar',
         'Bengaluru',
