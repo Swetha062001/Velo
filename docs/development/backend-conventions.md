@@ -17,6 +17,13 @@ Route  →  Controller  →  Service  →  Repository  →  PostgreSQL
 | **Schemas**    | `x.schemas.ts`    | Zod schemas for params / query / body                                                | —                                          |
 
 Small modules may skip a layer that would be empty (e.g. `health` has no repository yet).
+Admin CRUD modules with little business logic (`admin/categories`, `admin/inventory`,
+`admin/orders`, `admin/users`) keep schemas, queries and service in one file, split by section
+headers; routes and the controller stay separate (`admin.routes.ts`, `admin.controller.ts`).
+Anything with real rules (`admin/products`, `orders`, `cart`) uses the full layering.
+
+Database constraint violations (unique slug/SKU, CHECK rules) are translated to 400/409 with
+`mapConstraintError` in `utils/dbErrors.ts` — never let them surface as 500s.
 
 ## Module layout
 

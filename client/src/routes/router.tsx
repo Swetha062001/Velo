@@ -23,7 +23,9 @@ import {
   AdminDashboardPage,
   AdminInventoryPage,
   AdminLayout,
+  AdminOrderDetailPage,
   AdminOrdersPage,
+  AdminProductEditorPage,
   AdminProductsPage,
   AdminUsersPage,
 } from './adminPages.ts';
@@ -96,9 +98,12 @@ export const router = createBrowserRouter([
                 children: [
                   { index: true, Component: AdminDashboardPage },
                   { path: 'products', Component: AdminProductsPage },
+                  { path: 'products/new', Component: AdminProductEditorPage },
+                  { path: 'products/:id', Component: AdminProductEditorPage },
                   { path: 'categories', Component: AdminCategoriesPage },
                   { path: 'inventory', Component: AdminInventoryPage },
                   { path: 'orders', Component: AdminOrdersPage },
+                  { path: 'orders/:orderNumber', Component: AdminOrderDetailPage },
                   { path: 'users', Component: AdminUsersPage },
                   { path: '*', Component: NotFoundPage },
                 ],

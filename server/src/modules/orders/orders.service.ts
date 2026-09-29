@@ -1,3 +1,4 @@
+import type { PoolClient } from 'pg';
 import { withTransaction } from '../../db/index.js';
 import { AppError } from '../../utils/AppError.js';
 import { paginationMeta, toOffset, type PaginationQuery } from '../../utils/pagination.js';
@@ -16,6 +17,33 @@ import type { PlaceOrderInput } from './orders.schemas.js';
 
 /** Orders can be cancelled by the customer until the warehouse starts processing them. */
 const CUSTOMER_CANCELLABLE: OrderStatus[] = ['CONFIRMED'];
+
+/**
+ * Allowed status changes (admin). Delivered and cancelled are final; an order can be
+ * cancelled until it has shipped.
+ */
+export const ORDER_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
+  CONFIRMED: ['PROCESSING', 'CANCELLED'],
+  PROCESSING: ['SHIPPED', 'CANCELLED'],
+  SHIPPED: ['DELIVERED'],
+  DELIVERED: [],
+  CANCELLED: [],
+};
+
+/** Returns every line to stock and marks the order cancelled (refunded if it was paid). */
+export async function cancelOrderInTransaction(order: OrderRow, client: PoolClient) {
+  const items = await ordersRepository.findItems(order.id, client);
+  for (const item of items) {
+    if (item.variant_id)
+      await ordersRepository.incrementStock(item.variant_id, item.quantity, client);
+  }
+  await ordersRepository.updateStatus(
+    order.id,
+    'CANCELLED',
+    order.payment_status === 'PAID' ? 'REFUNDED' : order.payment_status,
+    client,
+  );
+}
 
 export interface OrderItemDto {
   id: string;
@@ -271,17 +299,7 @@ export const ordersService = {
         throw new AppError(409, 'NOT_CANCELLABLE', 'This order can no longer be cancelled');
       }
 
-      const items = await ordersRepository.findItems(order.id, client);
-      for (const item of items) {
-        if (item.variant_id)
-          await ordersRepository.incrementStock(item.variant_id, item.quantity, client);
-      }
-      await ordersRepository.updateStatus(
-        order.id,
-        'CANCELLED',
-        order.payment_status === 'PAID' ? 'REFUNDED' : order.payment_status,
-        client,
-      );
+      await cancelOrderInTransaction(order, client);
     });
     return loadOrder(userId, orderNumber);
   },

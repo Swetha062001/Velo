@@ -17,9 +17,12 @@ export const paths = {
 
   admin: '/admin',
   adminProducts: '/admin/products',
+  adminProductNew: '/admin/products/new',
+  adminProduct: (id: string) => `/admin/products/${id}`,
   adminCategories: '/admin/categories',
   adminInventory: '/admin/inventory',
   adminOrders: '/admin/orders',
+  adminOrder: (orderNumber: string) => `/admin/orders/${orderNumber}`,
   adminUsers: '/admin/users',
 } as const;
 

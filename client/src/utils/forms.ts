@@ -14,12 +14,15 @@ export function applyServerErrors<T extends FieldValues>(
   error: unknown,
   setError: UseFormSetError<T>,
   fields: ReadonlyArray<Path<T>>,
+  /** Server field → form field, when names differ (e.g. `pricePaise` → `price`). */
+  aliases: Record<string, Path<T>> = {},
 ): boolean {
   if (!(error instanceof ApiError) || !Array.isArray(error.details)) return false;
 
   let applied = false;
   for (const detail of error.details as ValidationDetail[]) {
-    const field = detail.path?.replace(/^body\./, '') as Path<T>;
+    const serverField = detail.path?.replace(/^body\./, '') ?? '';
+    const field = (aliases[serverField] ?? serverField) as Path<T>;
     if (fields.includes(field)) {
       setError(field, { type: 'server', message: detail.message });
       applied = true;

@@ -2,7 +2,7 @@
 
 AI-powered full-stack ecommerce platform for a fictional premium sneaker brand.
 
-> **Status:** Phase 9 — checkout & orders. This README grows with each phase; the complete
+> **Status:** Phase 10 — admin dashboard. This README grows with each phase; the complete
 > version (API overview, AI architecture, testing, troubleshooting) lands in Phase 15.
 
 ## Technology stack
@@ -150,6 +150,21 @@ Rules live in `server/src/config/commerce.ts`; pricing logic in `server/src/modu
   unit can't both succeed (and can't deadlock).
 - **History:** orders keep the prices and address from purchase time. Customers can cancel while
   an order is `CONFIRMED`; stock is returned and paid orders are marked refunded.
+
+## Admin
+
+`/admin` (admins only — enforced by the API, not just the UI):
+
+- **Dashboard** — revenue, orders, customers, products, orders by status, 14-day revenue chart,
+  low-stock alerts and recent orders.
+- **Products** — create (with images and a UK size run), edit, publish / unpublish / archive,
+  image ordering, sizes with SKU, price override, stock and low-stock level. Products that have
+  been ordered can be archived but not deleted.
+- **Categories** — create, edit, hide/show; only empty categories can be deleted.
+- **Inventory** — every size, most urgent first; filter low / out of stock; edit stock inline.
+- **Orders** — search and filter; move through Processing → Shipped → Delivered with enforced
+  transitions; cancelling restocks and refunds.
+- **Users** — order stats and role changes (admins can't change their own role).
 
 ## Theme
 

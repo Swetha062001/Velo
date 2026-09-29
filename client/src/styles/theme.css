@@ -35,6 +35,10 @@
   --velo-danger: #b91c1c;
   --velo-danger-soft: #fbe4e4;
 
+  /* Data-viz series colour (validated with the dataviz palette checks: lightness band,
+     chroma, >= 3:1 contrast on the chart surface). */
+  --velo-chart-1: #c2410c;
+
   color-scheme: light;
 }
 
@@ -64,6 +68,9 @@
   --velo-warning-soft: #33260c;
   --velo-danger: #f87171;
   --velo-danger-soft: #3a1414;
+
+  /* The dark UI accent is too light for chart fills; this step passes on the dark surface. */
+  --velo-chart-1: #e2622b;
 
   color-scheme: dark;
 }
@@ -97,6 +104,8 @@
   --color-warning-soft: var(--velo-warning-soft);
   --color-danger: var(--velo-danger);
   --color-danger-soft: var(--velo-danger-soft);
+
+  --color-chart-1: var(--velo-chart-1);
 }
 
 @theme {

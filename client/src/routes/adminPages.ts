@@ -8,7 +8,11 @@ import { lazy } from 'react';
 export const AdminLayout = lazy(() => import('../layouts/AdminLayout.tsx'));
 export const AdminDashboardPage = lazy(() => import('../pages/admin/AdminDashboardPage.tsx'));
 export const AdminProductsPage = lazy(() => import('../pages/admin/AdminProductsPage.tsx'));
+export const AdminProductEditorPage = lazy(
+  () => import('../pages/admin/AdminProductEditorPage.tsx'),
+);
 export const AdminCategoriesPage = lazy(() => import('../pages/admin/AdminCategoriesPage.tsx'));
 export const AdminInventoryPage = lazy(() => import('../pages/admin/AdminInventoryPage.tsx'));
 export const AdminOrdersPage = lazy(() => import('../pages/admin/AdminOrdersPage.tsx'));
+export const AdminOrderDetailPage = lazy(() => import('../pages/admin/AdminOrderDetailPage.tsx'));
 export const AdminUsersPage = lazy(() => import('../pages/admin/AdminUsersPage.tsx'));
