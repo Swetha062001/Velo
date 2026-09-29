@@ -17,6 +17,10 @@ export class AppError extends Error {
     return new AppError(400, 'BAD_REQUEST', message, details);
   }
 
+  static validation(details: Array<{ path: string; message: string }>) {
+    return new AppError(400, 'VALIDATION_ERROR', 'Request validation failed', details);
+  }
+
   static unauthorized(message = 'Authentication required') {
     return new AppError(401, 'UNAUTHORIZED', message);
   }
@@ -31,5 +35,9 @@ export class AppError extends Error {
 
   static conflict(message: string, details?: unknown) {
     return new AppError(409, 'CONFLICT', message, details);
+  }
+
+  static tooManyRequests(message = 'Too many requests, please try again later') {
+    return new AppError(429, 'RATE_LIMITED', message);
   }
 }

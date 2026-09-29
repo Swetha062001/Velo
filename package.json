@@ -2,7 +2,7 @@
   "name": "velo",
   "version": "0.1.0",
   "private": true,
-  "description": "VELO — AI-powered full-stack ecommerce platform",
+  "description": "VELO \u2014 AI-powered full-stack ecommerce platform",
   "type": "module",
   "workspaces": [
     "client",
@@ -20,7 +20,8 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "test": "npm run test --workspaces --if-present"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

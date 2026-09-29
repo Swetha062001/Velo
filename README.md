@@ -2,17 +2,17 @@
 
 AI-powered full-stack ecommerce platform for a fictional premium sneaker brand.
 
-> **Status:** Phase 2 — frontend foundation. This README grows with each phase; the complete
+> **Status:** Phase 3 — backend foundation. This README grows with each phase; the complete
 > version (API overview, AI architecture, testing, troubleshooting) lands in Phase 15.
 
 ## Technology stack
 
-| Layer    | Tech                                                                              |
-| -------- | --------------------------------------------------------------------------------- |
-| Client   | React 19, TypeScript, Vite, Tailwind CSS v4, React Router, TanStack Query, Lucide |
-| Server   | Node.js, Express 5, TypeScript, Zod, Helmet, CORS                                 |
-| Database | PostgreSQL (local) — added in Phase 4                                             |
-| Tooling  | npm workspaces, ESLint (flat config), Prettier, tsx, concurrently                 |
+| Layer    | Tech                                                                                 |
+| -------- | ------------------------------------------------------------------------------------ |
+| Client   | React 19, TypeScript, Vite, Tailwind CSS v4, React Router, TanStack Query, Lucide    |
+| Server   | Node.js, Express 5, TypeScript, Zod, Helmet, CORS, express-rate-limit                |
+| Database | PostgreSQL (local) — added in Phase 4                                                |
+| Tooling  | npm workspaces, ESLint (flat config), Prettier, tsx, concurrently, Vitest, Supertest |
 
 ## Prerequisites
 
@@ -44,15 +44,16 @@ npm run dev
 
 ## Development commands
 
-| Command              | What it does                                  |
-| -------------------- | --------------------------------------------- |
-| `npm run dev`        | Start client and server together (watch mode) |
-| `npm run dev:client` | Start only the Vite client                    |
-| `npm run dev:server` | Start only the API                            |
-| `npm run build`      | Production build of both workspaces           |
-| `npm run typecheck`  | TypeScript check across both workspaces       |
-| `npm run lint`       | ESLint over the whole repo                    |
-| `npm run format`     | Format with Prettier                          |
+| Command              | What it does                                     |
+| -------------------- | ------------------------------------------------ |
+| `npm run dev`        | Start client and server together (watch mode)    |
+| `npm run dev:client` | Start only the Vite client                       |
+| `npm run dev:server` | Start only the API                               |
+| `npm run build`      | Production build of both workspaces              |
+| `npm run typecheck`  | TypeScript check across both workspaces          |
+| `npm run lint`       | ESLint over the whole repo                       |
+| `npm test`           | Run the test suites (server: Vitest + Supertest) |
+| `npm run format`     | Format with Prettier                             |
 
 ## Environment variables
 
@@ -104,12 +105,16 @@ restyling raw elements.
 ```
 velo/
 ├── client/          React + Vite storefront and admin
-├── server/          Express API (feature modules under src/modules)
+├── server/          Express API (feature modules under src/modules, tests under tests/)
+├── docs/            Architecture and development docs
 ├── eslint.config.js Shared lint config
 └── package.json     npm workspaces + root scripts
 ```
 
-`database/` and `docs/` are added in the phases that populate them.
+Backend structure and rules (layers, responses, errors, validation, logging) are documented in
+[`docs/development/backend-conventions.md`](docs/development/backend-conventions.md).
+
+`database/` is added in Phase 4.
 
 ## Deployment
 
