@@ -204,8 +204,13 @@ To remove Ollama: `brew services stop ollama && brew uninstall ollama && rm -rf 
 All colours, fonts and radii live in **`client/src/styles/theme.css`**. Components use semantic
 utilities only — `bg-canvas`, `bg-surface`, `text-ink`, `text-ink-muted`, `border-line`,
 `bg-accent`, `bg-inverse`, `text-danger`, etc. Tailwind's default palette is intentionally reset, so
-off-brand classes such as `bg-blue-500` do not exist. A dark palette is already defined behind
-`<html data-theme="dark">`.
+off-brand classes such as `bg-blue-500` do not exist.
+
+**Dark mode** — choose Light, Dark or System (follows the device) in the footer; the header
+☀/☾ button flips quickly. The choice is saved per browser (`velo-theme` in localStorage) and a
+tiny script in `client/index.html` applies it before first paint, so there is no light flash.
+The dark palette lives under `:root[data-theme='dark']` in `theme.css`. `inverse` flips with the
+theme (primary buttons, selected states); `band` stays dark in both themes (footer, auth panel).
 
 Shared UI primitives live in `client/src/components/common/` — `Button` / `ButtonLink`, `Input`,
 `Badge`, `Spinner`, `Skeleton`, `EmptyState`, `ErrorState`. Build new UI from these rather than
@@ -213,14 +218,15 @@ restyling raw elements.
 
 ## Frontend architecture
 
-| Concern      | Location                                                                         |
-| ------------ | -------------------------------------------------------------------------------- |
-| Routes       | `client/src/routes/router.tsx` (admin is lazy-loaded); URLs in `routes/paths.ts` |
-| Layouts      | `client/src/layouts/` — Root, Storefront, Account, Admin                         |
-| API calls    | `client/src/lib/apiClient.ts` (fetch wrapper, cookies, typed `ApiError`)         |
-| Server state | TanStack Query — `lib/queryClient.ts`; feature calls in `services/` + `hooks/`   |
-| Navigation   | `client/src/config/navigation.ts`                                                |
-| Page titles  | `<DocumentTitle>` — one per page (React 19 hoists `<title>`)                     |
+| Concern      | Location                                                                                                                                                                                                                                                                 |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Routes       | `client/src/routes/router.tsx`; pages code-split in `storefrontPages.ts` / `adminPages.ts`; URLs in `routes/paths.ts`                                                                                                                                                    |
+| Layouts      | `client/src/layouts/` — Root, Storefront, Account, Admin                                                                                                                                                                                                                 |
+| API calls    | `client/src/lib/apiClient.ts` (fetch wrapper, cookies, typed `ApiError`)                                                                                                                                                                                                 |
+| Server state | TanStack Query — `lib/queryClient.ts`; feature calls in `services/` + `hooks/`                                                                                                                                                                                           |
+| Navigation   | `client/src/config/navigation.ts`                                                                                                                                                                                                                                        |
+| Page titles  | `<DocumentTitle>` — one per page (React 19 hoists `<title>`)                                                                                                                                                                                                             |
+| Bundles      | Only the home page ships in the first load; other pages load on demand (popular ones prefetched when idle). Vendors are split into cache-stable `vendor-react` / `vendor-query` / `vendor-forms` chunks (`vite.config.ts`); form libraries load only on pages with forms |
 
 ## Project structure
 

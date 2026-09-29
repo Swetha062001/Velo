@@ -60,6 +60,13 @@ function assertCanHold(snapshot: VariantSnapshotRow, quantity: number) {
  * Runs a cart mutation in a transaction. getOrCreateCartId's upsert row-locks the cart,
  * so concurrent requests for the same user are applied one at a time.
  */
+/** What a guest-cart merge had to change (counts of lines). */
+export interface MergeReport {
+  reduced: number;
+  unavailable: number;
+  cartFull: number;
+}
+
 function mutateCart<T>(userId: string, fn: (cartId: string, client: PoolClient) => Promise<T>) {
   return withTransaction(async (client) => {
     const cartId = await cartRepository.getOrCreateCartId(userId, client);
@@ -139,9 +146,11 @@ export const cartService = {
   /**
    * Moves a guest cart into the user's cart after sign-in. Quantities combine with what's
    * already there, clamped to stock and the per-item cap; unavailable items are skipped.
+   * Returns the cart plus a report of anything that couldn't be moved as-is.
    */
-  merge(userId: string, items: CartLineInput[]) {
-    return mutateCart(userId, async (cartId, client) => {
+  async merge(userId: string, items: CartLineInput[]) {
+    const report: MergeReport = { reduced: 0, unavailable: 0, cartFull: 0 };
+    const cart = await mutateCart(userId, async (cartId, client) => {
       const lines = dedupe(items);
       const snapshots = await cartRepository.findVariantSnapshots(
         lines.map((l) => l.variantId),
@@ -152,19 +161,24 @@ export const cartService = {
 
       for (const { variantId, quantity } of lines) {
         const snapshot = byId.get(variantId);
-        if (!snapshot?.purchasable || snapshot.stock <= 0) continue;
+        if (!snapshot?.purchasable || snapshot.stock <= 0) {
+          report.unavailable++;
+          continue;
+        }
 
         const existing = await cartRepository.findItemByVariant(cartId, variantId, client);
-        if (!existing && lineCount >= MAX_CART_LINES) continue;
+        if (!existing && lineCount >= MAX_CART_LINES) {
+          report.cartFull++;
+          continue;
+        }
 
-        const merged = Math.min(
-          (existing?.quantity ?? 0) + quantity,
-          MAX_QUANTITY_PER_ITEM,
-          snapshot.stock,
-        );
+        const wanted = (existing?.quantity ?? 0) + quantity;
+        const merged = Math.min(wanted, MAX_QUANTITY_PER_ITEM, snapshot.stock);
+        if (merged < wanted) report.reduced++;
         await cartRepository.setQuantity(cartId, variantId, merged, client);
         if (!existing) lineCount++;
       }
     });
+    return { cart, report };
   },
 };

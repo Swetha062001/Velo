@@ -92,15 +92,18 @@ function PurchasePanel({ product }: { product: ProductDetail }) {
       />
 
       <div className="flex gap-3">
-        <Button
-          size="lg"
-          fullWidth
-          disabled={soldOut}
-          loading={addToCart.isPending}
-          onClick={handleAdd}
-        >
-          {soldOut ? 'Sold out' : 'Add to bag'}
-        </Button>
+        {/* Buttons don't shrink; the wrapper does, leaving room for the wishlist heart. */}
+        <div className="min-w-0 flex-1">
+          <Button
+            size="lg"
+            fullWidth
+            disabled={soldOut}
+            loading={addToCart.isPending}
+            onClick={handleAdd}
+          >
+            {soldOut ? 'Sold out' : 'Add to bag'}
+          </Button>
+        </div>
         <WishlistButton product={product} variant="inline" />
       </div>
 

@@ -3,6 +3,7 @@ import { mergeGuestCartIntoAccount } from '../lib/cartSync.ts';
 import { applyWishlistIntent } from '../lib/wishlistIntent.ts';
 import { authService } from '../services/auth.service.ts';
 import type { User } from '../types/user.ts';
+import { useUi } from '../store/ui.ts';
 
 export const authKeys = {
   me: ['auth', 'me'] as const,
@@ -58,6 +59,7 @@ export function useLogout() {
     onSettled: () => {
       queryClient.clear();
       queryClient.setQueryData(authKeys.me, null);
+      useUi.getState().setCartNotice(null);
     },
   });
 }

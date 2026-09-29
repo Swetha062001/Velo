@@ -13,8 +13,10 @@
   --velo-canvas: #f7f6f3; /* page background — warm off-white */
   --velo-surface: #ffffff; /* cards, panels, inputs */
   --velo-surface-muted: #efede8; /* product image wells, subtle fills */
-  --velo-inverse: #121212; /* dark bands, footer, primary buttons */
+  --velo-inverse: #121212; /* primary buttons, selected states — flips in dark mode */
   --velo-inverse-fg: #f7f6f3;
+  --velo-band: #121212; /* large dark sections (footer, auth panel) — dark in both themes */
+  --velo-band-fg: #f7f6f3;
 
   --velo-ink: #121212; /* primary text */
   --velo-ink-muted: #5c5a55; /* secondary text */
@@ -42,13 +44,15 @@
   color-scheme: light;
 }
 
-/* Dark palette — wired up now so the toggle (Phase 13) needs no component changes. */
+/* Dark palette — applied by the theme toggle (store/theme.ts) and the pre-paint script in index.html. */
 :root[data-theme='dark'] {
   --velo-canvas: #0f0f0e;
   --velo-surface: #181816;
   --velo-surface-muted: #22211f;
   --velo-inverse: #f7f6f3;
   --velo-inverse-fg: #121212;
+  --velo-band: #181816;
+  --velo-band-fg: #f2f0eb;
 
   --velo-ink: #f2f0eb;
   --velo-ink-muted: #b0ada5;
@@ -85,6 +89,8 @@
   --color-surface-muted: var(--velo-surface-muted);
   --color-inverse: var(--velo-inverse);
   --color-inverse-fg: var(--velo-inverse-fg);
+  --color-band: var(--velo-band);
+  --color-band-fg: var(--velo-band-fg);
 
   --color-ink: var(--velo-ink);
   --color-ink-muted: var(--velo-ink-muted);

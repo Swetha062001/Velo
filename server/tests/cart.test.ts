@@ -315,6 +315,24 @@ describe('POST /cart/merge', () => {
     expect(byVariant[soldOut.id]).toBeUndefined();
     expect(byVariant[draftVariant.id]).toBeUndefined();
     expect(res.body.data.hasIssues).toBe(false);
+    expect(res.body.meta.merge).toEqual({
+      reduced: (5 > plenty.stock ? 1 : 0) + (10 > cheap.stock ? 1 : 0),
+      unavailable: 2,
+      cartFull: 0,
+    });
+  });
+
+  it('reports quantities capped at the per-item limit', async () => {
+    const agent = await signIn(DEV_ACCOUNTS.user.email, DEV_ACCOUNTS.user.password);
+    await agent.delete(`${api}/cart`);
+    await agent.post(`${api}/cart/items`).send({ variantId: plenty.id, quantity: 8 }).expect(200);
+
+    const res = await agent
+      .post(`${api}/cart/merge`)
+      .send({ items: [{ variantId: plenty.id, quantity: 5 }] })
+      .expect(200);
+    expect(res.body.data.items[0].quantity).toBe(Math.min(10, plenty.stock));
+    expect(res.body.meta.merge).toEqual({ reduced: 1, unavailable: 0, cartFull: 0 });
   });
 });
 

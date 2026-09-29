@@ -117,4 +117,13 @@ Moves a guest bag into the account cart.
 **Body** — same as `/cart/quote`.
 
 Quantities are added to existing lines and clamped to stock and the 10-per-item cap. Unknown,
-unavailable and sold-out variants are skipped silently. **200** — merged cart.
+unavailable and sold-out variants are skipped. **200** — merged cart, plus a report of what had
+to change (line counts), which the client turns into a notice on the bag and checkout:
+
+```json
+{ "data": { "items": [ … ] }, "meta": { "merge": { "reduced": 1, "unavailable": 1, "cartFull": 0 } } }
+```
+
+- `reduced` — quantity lowered to stock or the 10-per-item cap
+- `unavailable` — unknown, unpublished or sold-out variant, skipped
+- `cartFull` — skipped because the bag already has 20 lines

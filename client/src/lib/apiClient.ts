@@ -97,6 +97,9 @@ export const api = {
     requestEnvelope<T, M>('GET', path, options),
   post: <T>(path: string, body?: unknown, options?: RequestOptions) =>
     request<T>('POST', path, { ...options, body }),
+  /** POST that also returns `meta`. */
+  postWithMeta: <T, M>(path: string, body?: unknown, options?: RequestOptions) =>
+    requestEnvelope<T, M>('POST', path, { ...options, body }),
   patch: <T>(path: string, body?: unknown, options?: RequestOptions) =>
     request<T>('PATCH', path, { ...options, body }),
   put: <T>(path: string, body?: unknown, options?: RequestOptions) =>

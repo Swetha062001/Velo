@@ -7,6 +7,7 @@ import { ButtonLink } from '../common/Button.tsx';
 import { Drawer } from '../common/Drawer.tsx';
 import { EmptyState } from '../common/EmptyState.tsx';
 import { Spinner } from '../common/Spinner.tsx';
+import { CartMergeNotice } from './CartMergeNotice.tsx';
 import { CartLineItem } from './CartLineItem.tsx';
 import { FreeShippingProgress } from './OrderSummary.tsx';
 
@@ -63,6 +64,7 @@ export function CartDrawer() {
         />
       ) : (
         <>
+          <CartMergeNotice className="mb-5" />
           <FreeShippingProgress cart={cart} />
           <ul className="divide-y divide-line">
             {cart.items.map((line) => (

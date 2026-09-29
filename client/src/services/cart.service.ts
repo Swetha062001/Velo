@@ -1,5 +1,5 @@
 import { api } from '../lib/apiClient.ts';
-import type { Cart, GuestCartItem, GuestQuote } from '../types/cart.ts';
+import type { Cart, GuestCartItem, GuestQuote, MergeReport } from '../types/cart.ts';
 
 export const cartService = {
   get: (signal?: AbortSignal) => api.get<Cart>('/cart', { signal }),
@@ -10,5 +10,6 @@ export const cartService = {
   clear: () => api.delete<Cart>('/cart'),
   quote: (items: GuestCartItem[], signal?: AbortSignal) =>
     api.post<GuestQuote>('/cart/quote', { items }, { signal }),
-  merge: (items: GuestCartItem[]) => api.post<Cart>('/cart/merge', { items }),
+  merge: (items: GuestCartItem[]) =>
+    api.postWithMeta<Cart, { merge: MergeReport }>('/cart/merge', { items }),
 };

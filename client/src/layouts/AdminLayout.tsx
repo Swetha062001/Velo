@@ -2,6 +2,7 @@ import { ArrowLeft } from 'lucide-react';
 import { Suspense } from 'react';
 import { Link, NavLink, Outlet } from 'react-router';
 import { SignOutButton } from '../components/auth/SignOutButton.tsx';
+import { ThemeToggle } from '../components/common/ThemeToggle.tsx';
 import { SkipLink } from '../components/layout/SkipLink.tsx';
 import { FullPageSpinner } from '../components/common/Spinner.tsx';
 import { adminNav } from '../config/navigation.ts';
@@ -31,12 +32,15 @@ export default function AdminLayout() {
               Admin
             </span>
           </Link>
-          <Link
-            to={paths.home}
-            className="inline-flex items-center gap-1.5 text-xs font-medium text-ink-muted hover:text-ink lg:hidden"
-          >
-            <ArrowLeft aria-hidden className="size-3.5" /> Store
-          </Link>
+          <div className="flex items-center gap-1">
+            <ThemeToggle />
+            <Link
+              to={paths.home}
+              className="inline-flex items-center gap-1.5 px-2 text-xs font-medium text-ink-muted hover:text-ink lg:hidden"
+            >
+              <ArrowLeft aria-hidden className="size-3.5" /> Store
+            </Link>
+          </div>
         </div>
 
         <nav aria-label="Admin">

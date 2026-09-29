@@ -1,6 +1,7 @@
 import { ShoppingBag } from 'lucide-react';
 import { Link } from 'react-router';
 import { CartLineItem } from '../../components/cart/CartLineItem.tsx';
+import { CartMergeNotice } from '../../components/cart/CartMergeNotice.tsx';
 import { OrderSummary } from '../../components/cart/OrderSummary.tsx';
 import { Alert } from '../../components/common/Alert.tsx';
 import { ButtonLink } from '../../components/common/Button.tsx';
@@ -50,6 +51,7 @@ export default function CartPage() {
             <p className="text-sm text-ink-muted">
               {cart.itemCount} {cart.itemCount === 1 ? 'item' : 'items'}
             </p>
+            <CartMergeNotice className="mt-4" />
             {cart.hasIssues && (
               <Alert tone="danger" className="mt-4">
                 Some items need your attention before you can check out.

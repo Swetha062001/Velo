@@ -22,7 +22,7 @@ export function ApiStatus() {
         aria-hidden
         className={cn(
           'size-2 rounded-full',
-          isPending ? 'bg-inverse-fg/40' : isError ? 'bg-danger' : 'bg-success',
+          isPending ? 'bg-band-fg/40' : isError ? 'bg-danger' : 'bg-success',
         )}
       />
       {label}

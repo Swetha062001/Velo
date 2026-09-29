@@ -5,6 +5,7 @@ import { Link, useNavigate } from 'react-router';
 import { AddressForm } from '../../components/account/AddressForm.tsx';
 import { AddressLines } from '../../components/account/AddressLines.tsx';
 import { OrderSummary } from '../../components/cart/OrderSummary.tsx';
+import { CartMergeNotice } from '../../components/cart/CartMergeNotice.tsx';
 import { CheckoutSteps } from '../../components/checkout/CheckoutSteps.tsx';
 import type { CheckoutStep } from '../../components/checkout/steps.ts';
 import { Alert } from '../../components/common/Alert.tsx';
@@ -135,6 +136,7 @@ export default function CheckoutPage() {
 
       <div className="mt-10 grid grid-cols-1 gap-10 lg:grid-cols-[1fr_24rem] lg:gap-14">
         <div className="min-w-0 space-y-6">
+          <CartMergeNotice />
           {notice && <Alert tone="danger">{notice}</Alert>}
           {cart.hasIssues && (
             <Alert tone="danger">

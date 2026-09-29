@@ -35,6 +35,7 @@ export const cartController = {
   },
 
   async merge(req: Request<unknown, unknown, GuestCartInput>, res: Response) {
-    ok(res, await cartService.merge(currentUser(req).id, req.body.items));
+    const { cart, report } = await cartService.merge(currentUser(req).id, req.body.items);
+    ok(res, cart, { merge: report });
   },
 };

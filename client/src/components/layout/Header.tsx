@@ -12,6 +12,7 @@ import { Container } from './Container.tsx';
 import { Logo } from './Logo.tsx';
 import { MobileNav } from './MobileNav.tsx';
 import { SearchDialog } from './SearchDialog.tsx';
+import { ThemeToggle } from '../common/ThemeToggle.tsx';
 import { useUi } from '../../store/ui.ts';
 
 function IconLink({ to, label, icon: Icon }: { to: string; label: string; icon: LucideIcon }) {
@@ -101,6 +102,7 @@ export function Header() {
               Admin dashboard
             </Link>
           )}
+          <ThemeToggle className="hidden sm:inline-flex" />
           <button
             type="button"
             onClick={openAssistant}

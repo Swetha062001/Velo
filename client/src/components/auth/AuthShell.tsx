@@ -25,18 +25,16 @@ export function AuthShell({ title, subtitle, children, footer }: AuthShellProps)
 
       <aside
         aria-hidden
-        className="relative hidden overflow-hidden bg-inverse p-12 text-inverse-fg lg:flex lg:flex-col lg:justify-end"
+        className="relative hidden overflow-hidden bg-band p-12 text-band-fg lg:flex lg:flex-col lg:justify-end"
       >
-        <span className="pointer-events-none absolute -top-10 -right-10 font-display text-[18rem] leading-none font-black text-inverse-fg/[0.05] [font-stretch:125%]">
+        <span className="pointer-events-none absolute -top-10 -right-10 font-display text-[18rem] leading-none font-black text-band-fg/[0.05] [font-stretch:125%]">
           V.
         </span>
-        <p className="text-xs font-semibold tracking-[0.2em] text-inverse-fg/60 uppercase">
-          Members
-        </p>
+        <p className="text-xs font-semibold tracking-[0.2em] text-band-fg/60 uppercase">Members</p>
         <p className="mt-4 max-w-md font-display text-4xl leading-tight font-extrabold [font-stretch:110%]">
           Your wishlist, orders and AI picks — in one place.
         </p>
-        <ul className="mt-8 space-y-2 text-sm text-inverse-fg/70">
+        <ul className="mt-8 space-y-2 text-sm text-band-fg/70">
           <li>— Save favourites and move them to your cart</li>
           <li>— Track every order from checkout to delivery</li>
           <li>— Faster checkout with saved addresses</li>

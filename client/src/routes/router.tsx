@@ -1,23 +1,10 @@
 import { createBrowserRouter } from 'react-router';
 import { FullPageSpinner } from '../components/common/Spinner.tsx';
-import AccountLayout from '../layouts/AccountLayout.tsx';
 import RootLayout from '../layouts/RootLayout.tsx';
 import StorefrontLayout from '../layouts/StorefrontLayout.tsx';
-import AccountOverviewPage from '../pages/account/AccountOverviewPage.tsx';
-import AddressesPage from '../pages/account/AddressesPage.tsx';
-import OrderDetailPage from '../pages/account/OrderDetailPage.tsx';
-import OrdersPage from '../pages/account/OrdersPage.tsx';
-import LoginPage from '../pages/auth/LoginPage.tsx';
-import RegisterPage from '../pages/auth/RegisterPage.tsx';
-import CartPage from '../pages/cart/CartPage.tsx';
-import CheckoutPage from '../pages/checkout/CheckoutPage.tsx';
-import OrderConfirmationPage from '../pages/checkout/OrderConfirmationPage.tsx';
 import NotFoundPage from '../pages/errors/NotFoundPage.tsx';
 import RouteErrorPage from '../pages/errors/RouteErrorPage.tsx';
 import HomePage from '../pages/home/HomePage.tsx';
-import ProductPage from '../pages/product/ProductPage.tsx';
-import ProductsPage from '../pages/products/ProductsPage.tsx';
-import WishlistPage from '../pages/wishlist/WishlistPage.tsx';
 import {
   AdminCategoriesPage,
   AdminDashboardPage,
@@ -30,6 +17,21 @@ import {
   AdminUsersPage,
 } from './adminPages.ts';
 import { GuestOnly, RequireAdmin, RequireAuth } from './guards.tsx';
+import {
+  AccountLayout,
+  AccountOverviewPage,
+  AddressesPage,
+  CartPage,
+  CheckoutPage,
+  LoginPage,
+  OrderConfirmationPage,
+  OrderDetailPage,
+  OrdersPage,
+  ProductPage,
+  ProductsPage,
+  RegisterPage,
+  WishlistPage,
+} from './storefrontPages.ts';
 
 export const router = createBrowserRouter([
   {

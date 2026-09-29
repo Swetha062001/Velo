@@ -1,10 +1,11 @@
-import { X } from 'lucide-react';
+import { Moon, Sun, X } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import { Link } from 'react-router';
 import { accountNav, storefrontNav } from '../../config/navigation.ts';
 import { useCurrentUser } from '../../hooks/useAuth.ts';
 import { SignOutButton } from '../auth/SignOutButton.tsx';
 import { paths } from '../../routes/paths.ts';
+import { useTheme } from '../../store/theme.ts';
 import { Logo } from './Logo.tsx';
 
 interface MobileNavProps {
@@ -17,6 +18,8 @@ interface MobileNavProps {
  * focus trapping, Esc-to-close and inert background come from the browser.
  */
 export function MobileNav({ open, onClose }: MobileNavProps) {
+  const dark = useTheme((s) => s.resolved === 'dark');
+  const toggleTheme = useTheme((s) => s.toggle);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const { data: user } = useCurrentUser();
 
@@ -122,6 +125,21 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
               </>
             )}
           </ul>
+
+          <div className="mt-8 border-t border-line pt-6">
+            <button
+              type="button"
+              onClick={toggleTheme}
+              className="flex items-center gap-2 py-2 text-sm text-ink-muted hover:text-ink"
+            >
+              {dark ? (
+                <Sun aria-hidden className="size-4" />
+              ) : (
+                <Moon aria-hidden className="size-4" />
+              )}
+              {dark ? 'Light theme' : 'Dark theme'}
+            </button>
+          </div>
         </nav>
       </div>
     </dialog>

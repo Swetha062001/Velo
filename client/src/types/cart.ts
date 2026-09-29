@@ -42,3 +42,10 @@ export interface GuestCartItem {
   variantId: string;
   quantity: number;
 }
+
+/** What the server had to change when moving the guest bag into the account (line counts). */
+export interface MergeReport {
+  reduced: number;
+  unavailable: number;
+  cartFull: number;
+}
