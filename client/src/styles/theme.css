@@ -1,0 +1,114 @@
+/*
+ * VELO design tokens — the single source of truth for colour, type and shape.
+ *
+ * Components use SEMANTIC utilities only (bg-canvas, text-ink, bg-accent, border-line…).
+ * Tailwind's default palette is reset, so `bg-blue-500`-style classes do not exist —
+ * this keeps every screen on-brand. To re-theme, change the raw values below.
+ *
+ * Contrast (WCAG AA): ink / ink-muted on canvas & surface ≥ 4.5:1;
+ * accent-fg on accent ≥ 4.5:1. `ink-subtle` is for decoration/disabled only.
+ */
+
+:root {
+  --velo-canvas: #f7f6f3; /* page background — warm off-white */
+  --velo-surface: #ffffff; /* cards, panels, inputs */
+  --velo-surface-muted: #efede8; /* product image wells, subtle fills */
+  --velo-inverse: #121212; /* dark bands, footer, primary buttons */
+  --velo-inverse-fg: #f7f6f3;
+
+  --velo-ink: #121212; /* primary text */
+  --velo-ink-muted: #5c5a55; /* secondary text */
+  --velo-ink-subtle: #8a877f; /* placeholders, disabled */
+
+  --velo-line: #e3e0d9; /* hairline borders */
+  --velo-line-strong: #cfcbc2;
+
+  --velo-accent: #c2410c; /* "Ember" — used sparingly: CTAs, sale, highlights */
+  --velo-accent-hover: #9a3412;
+  --velo-accent-fg: #ffffff;
+  --velo-accent-soft: #fbe9df;
+
+  --velo-success: #15803d;
+  --velo-success-soft: #e3f4e8;
+  --velo-warning: #b45309;
+  --velo-warning-soft: #fdf1dc;
+  --velo-danger: #b91c1c;
+  --velo-danger-soft: #fbe4e4;
+
+  color-scheme: light;
+}
+
+/* Dark palette — wired up now so the toggle (Phase 13) needs no component changes. */
+:root[data-theme='dark'] {
+  --velo-canvas: #0f0f0e;
+  --velo-surface: #181816;
+  --velo-surface-muted: #22211f;
+  --velo-inverse: #f7f6f3;
+  --velo-inverse-fg: #121212;
+
+  --velo-ink: #f2f0eb;
+  --velo-ink-muted: #b0ada5;
+  --velo-ink-subtle: #7a776f;
+
+  --velo-line: #2c2b28;
+  --velo-line-strong: #3d3b37;
+
+  --velo-accent: #f06a35;
+  --velo-accent-hover: #ff8352;
+  --velo-accent-fg: #121212;
+  --velo-accent-soft: #3a1d10;
+
+  --velo-success: #4ade80;
+  --velo-success-soft: #12301d;
+  --velo-warning: #fbbf24;
+  --velo-warning-soft: #33260c;
+  --velo-danger: #f87171;
+  --velo-danger-soft: #3a1414;
+
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-*: initial;
+  --color-white: #ffffff;
+  --color-black: #000000;
+
+  --color-canvas: var(--velo-canvas);
+  --color-surface: var(--velo-surface);
+  --color-surface-muted: var(--velo-surface-muted);
+  --color-inverse: var(--velo-inverse);
+  --color-inverse-fg: var(--velo-inverse-fg);
+
+  --color-ink: var(--velo-ink);
+  --color-ink-muted: var(--velo-ink-muted);
+  --color-ink-subtle: var(--velo-ink-subtle);
+
+  --color-line: var(--velo-line);
+  --color-line-strong: var(--velo-line-strong);
+
+  --color-accent: var(--velo-accent);
+  --color-accent-hover: var(--velo-accent-hover);
+  --color-accent-fg: var(--velo-accent-fg);
+  --color-accent-soft: var(--velo-accent-soft);
+
+  --color-success: var(--velo-success);
+  --color-success-soft: var(--velo-success-soft);
+  --color-warning: var(--velo-warning);
+  --color-warning-soft: var(--velo-warning-soft);
+  --color-danger: var(--velo-danger);
+  --color-danger-soft: var(--velo-danger-soft);
+}
+
+@theme {
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Archivo', 'Inter', ui-sans-serif, system-ui, sans-serif;
+
+  /* Restrained corners — premium, not bubbly. */
+  --radius-xs: 2px;
+  --radius-sm: 3px;
+  --radius-md: 4px;
+  --radius-lg: 6px;
+  --radius-xl: 8px;
+
+  --ease-velo: cubic-bezier(0.2, 0.7, 0.2, 1);
+}

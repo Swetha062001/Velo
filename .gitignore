@@ -1,0 +1,38 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+*.tsbuildinfo
+
+# Environment — never commit real env files (examples ARE committed)
+.env
+.env.*
+!.env.example
+
+# Test output
+coverage/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Uploaded files (local image storage)
+server/uploads/
+
+# Credentials / keys
+*.pem
+*.key
+*.p12
+*.crt
+credentials*.json
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.swp
