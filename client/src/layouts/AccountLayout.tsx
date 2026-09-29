@@ -1,4 +1,5 @@
 import { NavLink, Outlet } from 'react-router';
+import { SignOutButton } from '../components/auth/SignOutButton.tsx';
 import { Container } from '../components/layout/Container.tsx';
 import { accountNav } from '../config/navigation.ts';
 import { paths } from '../routes/paths.ts';
@@ -10,7 +11,7 @@ export default function AccountLayout() {
     <Container className="py-10 sm:py-14">
       <p className="text-xs font-semibold tracking-[0.18em] text-ink-muted uppercase">My account</p>
 
-      <div className="mt-6 grid gap-8 lg:grid-cols-[14rem_1fr] lg:gap-12">
+      <div className="mt-6 grid grid-cols-1 gap-8 lg:grid-cols-[14rem_1fr] lg:gap-12">
         <nav aria-label="Account">
           <ul className="-mx-4 flex gap-1 overflow-x-auto border-b border-line px-4 lg:mx-0 lg:flex-col lg:border-0 lg:px-0">
             {accountNav.map(({ label, to, icon: Icon }) => (
@@ -32,6 +33,9 @@ export default function AccountLayout() {
                 </NavLink>
               </li>
             ))}
+            <li className="lg:mt-4 lg:border-t lg:border-line lg:pt-4">
+              <SignOutButton className="px-3 py-3 whitespace-nowrap text-ink-muted hover:text-ink" />
+            </li>
           </ul>
         </nav>
 

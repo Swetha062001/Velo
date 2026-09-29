@@ -2,6 +2,8 @@ import { X } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import { Link } from 'react-router';
 import { accountNav, storefrontNav } from '../../config/navigation.ts';
+import { useCurrentUser } from '../../hooks/useAuth.ts';
+import { SignOutButton } from '../auth/SignOutButton.tsx';
 import { paths } from '../../routes/paths.ts';
 import { Logo } from './Logo.tsx';
 
@@ -16,6 +18,7 @@ interface MobileNavProps {
  */
 export function MobileNav({ open, onClose }: MobileNavProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const { data: user } = useCurrentUser();
 
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -67,17 +70,57 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
           </ul>
 
           <ul className="mt-8 space-y-1 border-t border-line pt-6">
-            {[...accountNav, { label: 'Wishlist', to: paths.wishlist }].map((item) => (
-              <li key={item.to}>
-                <Link
-                  to={item.to}
-                  onClick={onClose}
-                  className="block py-2 text-sm text-ink-muted hover:text-ink"
-                >
-                  {item.label}
-                </Link>
-              </li>
-            ))}
+            {user ? (
+              <>
+                <li className="pb-2 text-xs text-ink-subtle">Signed in as {user.email}</li>
+                {user.role === 'ADMIN' && (
+                  <li>
+                    <Link
+                      to={paths.admin}
+                      onClick={onClose}
+                      className="block py-2 text-sm font-semibold text-accent"
+                    >
+                      Admin dashboard
+                    </Link>
+                  </li>
+                )}
+                {[...accountNav, { label: 'Wishlist', to: paths.wishlist }].map((item) => (
+                  <li key={item.to}>
+                    <Link
+                      to={item.to}
+                      onClick={onClose}
+                      className="block py-2 text-sm text-ink-muted hover:text-ink"
+                    >
+                      {item.label}
+                    </Link>
+                  </li>
+                ))}
+                <li>
+                  <SignOutButton onDone={onClose} className="py-2 text-ink-muted hover:text-ink" />
+                </li>
+              </>
+            ) : (
+              <>
+                <li>
+                  <Link
+                    to={paths.login}
+                    onClick={onClose}
+                    className="block py-2 text-sm font-semibold"
+                  >
+                    Sign in
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to={paths.register}
+                    onClick={onClose}
+                    className="block py-2 text-sm text-ink-muted hover:text-ink"
+                  >
+                    Create account
+                  </Link>
+                </li>
+              </>
+            )}
           </ul>
         </nav>
       </div>

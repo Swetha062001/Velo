@@ -1,3 +1,4 @@
+import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express from 'express';
 import helmet from 'helmet';
@@ -24,6 +25,14 @@ export function createApp() {
     }),
   );
   app.use(express.json({ limit: '100kb' }));
+  app.use(cookieParser());
+
+  // API responses can contain private data (profile, cart, orders): never cache them.
+  app.set('etag', false);
+  app.use('/api', (_req, res, next) => {
+    res.setHeader('Cache-Control', 'no-store');
+    next();
+  });
 
   app.use('/api/v1', apiRateLimiter, apiRouter);
 

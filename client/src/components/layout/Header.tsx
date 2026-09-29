@@ -3,6 +3,7 @@ import { Heart, Menu, Search, ShoppingBag, User } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router';
 import { storefrontNav } from '../../config/navigation.ts';
+import { useCurrentUser } from '../../hooks/useAuth.ts';
 import { paths } from '../../routes/paths.ts';
 import { cn } from '../../utils/cn.ts';
 import { Container } from './Container.tsx';
@@ -25,6 +26,7 @@ function IconLink({ to, label, icon: Icon }: { to: string; label: string; icon: 
 export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
+  const { data: user } = useCurrentUser();
   const currentUrl = location.pathname + location.search;
 
   return (
@@ -69,11 +71,23 @@ export function Header() {
         </nav>
 
         <div className="ml-auto flex items-center gap-0.5">
+          {user?.role === 'ADMIN' && (
+            <Link
+              to={paths.admin}
+              className="mr-2 hidden rounded-xs bg-accent-soft px-2 py-1 text-xs font-semibold tracking-wide text-accent uppercase transition-colors hover:bg-accent hover:text-accent-fg sm:inline-block"
+            >
+              Admin
+            </Link>
+          )}
           <IconLink to={paths.products} label="Search products" icon={Search} />
           <span className="hidden sm:contents">
             <IconLink to={paths.wishlist} label="Wishlist" icon={Heart} />
           </span>
-          <IconLink to={paths.account} label="Account" icon={User} />
+          <IconLink
+            to={user ? paths.account : paths.login}
+            label={user ? `Account — ${user.name}` : 'Sign in'}
+            icon={User}
+          />
           <IconLink to={paths.cart} label="Cart" icon={ShoppingBag} />
         </div>
       </Container>

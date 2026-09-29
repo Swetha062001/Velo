@@ -11,6 +11,10 @@ const envSchema = z.object({
   DATABASE_URL: postgresUrl,
   // Only needed for `npm run db:*:test` and the test suite.
   TEST_DATABASE_URL: postgresUrl.optional(),
+  JWT_SECRET: z
+    .string()
+    .min(32, 'Must be at least 32 characters — generate with: openssl rand -base64 48')
+    .refine((s) => !s.startsWith('replace-with'), 'Replace the placeholder from .env.example'),
 });
 
 const parsed = envSchema.safeParse(process.env);

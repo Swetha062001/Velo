@@ -2,17 +2,17 @@
 
 AI-powered full-stack ecommerce platform for a fictional premium sneaker brand.
 
-> **Status:** Phase 4 — database. This README grows with each phase; the complete
+> **Status:** Phase 5 — authentication. This README grows with each phase; the complete
 > version (API overview, AI architecture, testing, troubleshooting) lands in Phase 15.
 
 ## Technology stack
 
-| Layer    | Tech                                                                                 |
-| -------- | ------------------------------------------------------------------------------------ |
-| Client   | React 19, TypeScript, Vite, Tailwind CSS v4, React Router, TanStack Query, Lucide    |
-| Server   | Node.js, Express 5, TypeScript, Zod, Helmet, CORS, express-rate-limit                |
-| Database | PostgreSQL 13+ (local), node-postgres (`pg`), plain SQL migrations, bcryptjs         |
-| Tooling  | npm workspaces, ESLint (flat config), Prettier, tsx, concurrently, Vitest, Supertest |
+| Layer    | Tech                                                                                                    |
+| -------- | ------------------------------------------------------------------------------------------------------- |
+| Client   | React 19, TypeScript, Vite, Tailwind CSS v4, React Router, TanStack Query, React Hook Form, Zod, Lucide |
+| Server   | Node.js, Express 5, TypeScript, Zod, Helmet, CORS, express-rate-limit, jsonwebtoken, cookie-parser      |
+| Database | PostgreSQL 13+ (local), node-postgres (`pg`), plain SQL migrations, bcryptjs                            |
+| Tooling  | npm workspaces, ESLint (flat config), Prettier, tsx, concurrently, Vitest, Supertest                    |
 
 ## Prerequisites
 
@@ -84,13 +84,14 @@ Real `.env` files are git-ignored. Only the `.env.example` files are committed.
 
 ### `server/.env`
 
-| Variable            | Purpose                                               | Example                                                      | Secret  | Where to obtain                                 |
-| ------------------- | ----------------------------------------------------- | ------------------------------------------------------------ | ------- | ----------------------------------------------- |
-| `PORT`              | Port the API listens on                               | `5001`                                                       | No      | Choose any free port                            |
-| `NODE_ENV`          | Runtime mode: `development` \| `test` \| `production` | `development`                                                | No      | —                                               |
-| `CORS_ORIGIN`       | Exact frontend origin allowed to call the API         | `http://localhost:5173`                                      | No      | The client dev URL                              |
-| `DATABASE_URL`      | PostgreSQL connection for the app and `db:*` commands | `postgres://velo:velo_dev_password@localhost:5432/velo_dev`  | **Yes** | Created in [database setup](database/README.md) |
-| `TEST_DATABASE_URL` | Separate database for tests; wiped on every test run  | `postgres://velo:velo_dev_password@localhost:5432/velo_test` | **Yes** | Created in [database setup](database/README.md) |
+| Variable            | Purpose                                               | Example                                                      | Secret  | Where to obtain                                   |
+| ------------------- | ----------------------------------------------------- | ------------------------------------------------------------ | ------- | ------------------------------------------------- |
+| `PORT`              | Port the API listens on                               | `5001`                                                       | No      | Choose any free port                              |
+| `NODE_ENV`          | Runtime mode: `development` \| `test` \| `production` | `development`                                                | No      | —                                                 |
+| `CORS_ORIGIN`       | Exact frontend origin allowed to call the API         | `http://localhost:5173`                                      | No      | The client dev URL                                |
+| `DATABASE_URL`      | PostgreSQL connection for the app and `db:*` commands | `postgres://velo:velo_dev_password@localhost:5432/velo_dev`  | **Yes** | Created in [database setup](database/README.md)   |
+| `TEST_DATABASE_URL` | Separate database for tests; wiped on every test run  | `postgres://velo:velo_dev_password@localhost:5432/velo_test` | **Yes** | Created in [database setup](database/README.md)   |
+| `JWT_SECRET`        | Signs session tokens. Min 32 random characters        | output of `openssl rand -base64 48`                          | **Yes** | Generate locally; never reuse across environments |
 
 The server validates these at startup and exits with a clear message if any are invalid.
 
@@ -100,7 +101,22 @@ The server validates these at startup and exits with a clear message if any are 
 | ------------------- | ------------------- | ------------------------------ | -------------------------------------------------------------------- |
 | `VITE_API_BASE_URL` | Base URL of the API | `http://localhost:5001/api/v1` | **No — everything in the client is public. Never put secrets here.** |
 
-Further variables (auth, AI) are added and documented in the phase that introduces them.
+Further variables (AI, image storage) are added and documented in the phase that introduces them.
+
+## Authentication
+
+- Email + password accounts; passwords hashed with **bcrypt** (cost 12).
+- Session = signed **JWT (HS256)** in an **httpOnly, SameSite=Lax** cookie named `velo_session`
+  (7 days). JavaScript can't read it, and it isn't sent on cross-site form posts.
+- Every authenticated request re-loads the user from the database, so **roles are never trusted
+  from the token or the client**. Changing the password bumps `token_version`, revoking all other
+  sessions.
+- Roles: `USER`, `ADMIN`. Authorization is enforced on the server (`authenticate`,
+  `requireRole('ADMIN')`). The client's route guards (`RequireAuth`, `RequireAdmin`,
+  `GuestOnly`) only decide what to render.
+- Sign-in failures return one generic message; failed attempts are rate-limited.
+
+API reference: [`docs/api/`](docs/api/README.md).
 
 ## Theme
 

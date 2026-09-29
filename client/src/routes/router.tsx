@@ -1,4 +1,4 @@
-import type { ComponentType } from 'react';
+import { lazy } from 'react';
 import { createBrowserRouter } from 'react-router';
 import { FullPageSpinner } from '../components/common/Spinner.tsx';
 import AccountLayout from '../layouts/AccountLayout.tsx';
@@ -18,11 +18,20 @@ import HomePage from '../pages/home/HomePage.tsx';
 import ProductPage from '../pages/product/ProductPage.tsx';
 import ProductsPage from '../pages/products/ProductsPage.tsx';
 import WishlistPage from '../pages/wishlist/WishlistPage.tsx';
+import { GuestOnly, RequireAdmin, RequireAuth } from './guards.tsx';
 
-/** Code-split a route: the module's default export becomes the route component. */
-const lazyRoute = (load: () => Promise<{ default: ComponentType }>) => async () => ({
-  Component: (await load()).default,
-});
+/*
+ * Admin screens use React.lazy (not the router's `lazy`): React.lazy fetches a chunk only
+ * when the component renders, so the RequireAdmin guard keeps non-admins from ever
+ * downloading admin code. (Router `lazy` loads every matched route before rendering.)
+ */
+const AdminLayout = lazy(() => import('../layouts/AdminLayout.tsx'));
+const AdminDashboardPage = lazy(() => import('../pages/admin/AdminDashboardPage.tsx'));
+const AdminProductsPage = lazy(() => import('../pages/admin/AdminProductsPage.tsx'));
+const AdminCategoriesPage = lazy(() => import('../pages/admin/AdminCategoriesPage.tsx'));
+const AdminInventoryPage = lazy(() => import('../pages/admin/AdminInventoryPage.tsx'));
+const AdminOrdersPage = lazy(() => import('../pages/admin/AdminOrdersPage.tsx'));
+const AdminUsersPage = lazy(() => import('../pages/admin/AdminUsersPage.tsx'));
 
 export const router = createBrowserRouter([
   {
@@ -42,56 +51,61 @@ export const router = createBrowserRouter([
               { path: 'products', Component: ProductsPage },
               { path: 'products/:slug', Component: ProductPage },
               { path: 'cart', Component: CartPage },
-              { path: 'wishlist', Component: WishlistPage },
-              { path: 'checkout', Component: CheckoutPage },
-              { path: 'login', Component: LoginPage },
-              { path: 'register', Component: RegisterPage },
+
+              // Signed-out only
               {
-                path: 'account',
-                Component: AccountLayout,
+                Component: GuestOnly,
                 children: [
-                  { index: true, Component: AccountOverviewPage },
-                  { path: 'orders', Component: OrdersPage },
-                  { path: 'orders/:orderNumber', Component: OrderDetailPage },
-                  { path: 'addresses', Component: AddressesPage },
+                  { path: 'login', Component: LoginPage },
+                  { path: 'register', Component: RegisterPage },
                 ],
               },
+
+              // Signed-in only
+              {
+                Component: RequireAuth,
+                children: [
+                  { path: 'wishlist', Component: WishlistPage },
+                  { path: 'checkout', Component: CheckoutPage },
+                  {
+                    path: 'account',
+                    Component: AccountLayout,
+                    children: [
+                      { index: true, Component: AccountOverviewPage },
+                      { path: 'orders', Component: OrdersPage },
+                      { path: 'orders/:orderNumber', Component: OrderDetailPage },
+                      { path: 'addresses', Component: AddressesPage },
+                    ],
+                  },
+                ],
+              },
+
               { path: '*', Component: NotFoundPage },
             ],
           },
         ],
       },
 
-      // Admin — lazy-loaded chunk
+      // Admin — the guard renders first; admin chunks load only for admins
       {
         path: 'admin',
-        lazy: lazyRoute(() => import('../layouts/AdminLayout.tsx')),
+        Component: RequireAdmin,
         children: [
           {
-            errorElement: <RouteErrorPage />,
+            Component: AdminLayout,
             children: [
               {
-                index: true,
-                lazy: lazyRoute(() => import('../pages/admin/AdminDashboardPage.tsx')),
+                errorElement: <RouteErrorPage />,
+                children: [
+                  { index: true, Component: AdminDashboardPage },
+                  { path: 'products', Component: AdminProductsPage },
+                  { path: 'categories', Component: AdminCategoriesPage },
+                  { path: 'inventory', Component: AdminInventoryPage },
+                  { path: 'orders', Component: AdminOrdersPage },
+                  { path: 'users', Component: AdminUsersPage },
+                  { path: '*', Component: NotFoundPage },
+                ],
               },
-              {
-                path: 'products',
-                lazy: lazyRoute(() => import('../pages/admin/AdminProductsPage.tsx')),
-              },
-              {
-                path: 'categories',
-                lazy: lazyRoute(() => import('../pages/admin/AdminCategoriesPage.tsx')),
-              },
-              {
-                path: 'inventory',
-                lazy: lazyRoute(() => import('../pages/admin/AdminInventoryPage.tsx')),
-              },
-              {
-                path: 'orders',
-                lazy: lazyRoute(() => import('../pages/admin/AdminOrdersPage.tsx')),
-              },
-              { path: 'users', lazy: lazyRoute(() => import('../pages/admin/AdminUsersPage.tsx')) },
-              { path: '*', Component: NotFoundPage },
             ],
           },
         ],

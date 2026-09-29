@@ -1,4 +1,4 @@
-import { useId, type ComponentProps } from 'react';
+import { useId, type ComponentProps, type ReactNode } from 'react';
 import { cn } from '../../utils/cn.ts';
 
 interface InputProps extends ComponentProps<'input'> {
@@ -7,9 +7,20 @@ interface InputProps extends ComponentProps<'input'> {
   error?: string;
   /** Visually hide the label (it stays available to screen readers). */
   hideLabel?: boolean;
+  /** Element rendered inside the right edge of the field (e.g. a show-password button). */
+  trailing?: ReactNode;
 }
 
-export function Input({ label, hint, error, hideLabel, id, className, ...props }: InputProps) {
+export function Input({
+  label,
+  hint,
+  error,
+  hideLabel,
+  trailing,
+  id,
+  className,
+  ...props
+}: InputProps) {
   const autoId = useId();
   const inputId = id ?? autoId;
   const hintId = `${inputId}-hint`;
@@ -24,18 +35,25 @@ export function Input({ label, hint, error, hideLabel, id, className, ...props }
       <label htmlFor={inputId} className={cn('text-sm font-medium', hideLabel && 'sr-only')}>
         {label}
       </label>
-      <input
-        id={inputId}
-        aria-invalid={error ? true : undefined}
-        aria-describedby={describedBy || undefined}
-        className={cn(
-          'h-11 w-full rounded-md border bg-surface px-3.5 text-sm text-ink transition-colors',
-          'placeholder:text-ink-subtle disabled:cursor-not-allowed disabled:opacity-60',
-          error ? 'border-danger' : 'border-line-strong hover:border-ink-muted',
-          className,
+      <div className="relative">
+        <input
+          id={inputId}
+          aria-invalid={error ? true : undefined}
+          aria-describedby={describedBy || undefined}
+          className={cn(
+            'h-11 w-full rounded-md border bg-surface px-3.5 text-sm text-ink transition-colors',
+            'placeholder:text-ink-subtle disabled:cursor-not-allowed disabled:opacity-60',
+            'read-only:bg-surface-muted read-only:text-ink-muted',
+            error ? 'border-danger' : 'border-line-strong hover:border-ink-muted',
+            trailing ? 'pr-11' : null,
+            className,
+          )}
+          {...props}
+        />
+        {trailing && (
+          <div className="absolute inset-y-0 right-0 flex items-center pr-1">{trailing}</div>
         )}
-        {...props}
-      />
+      </div>
       {hint && !error && (
         <p id={hintId} className="text-xs text-ink-muted">
           {hint}

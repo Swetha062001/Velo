@@ -5,6 +5,8 @@ interface LimiterOptions {
   windowMs: number;
   limit: number;
   message?: string;
+  /** Count only failed requests (status >= 400) — used for login/password attempts. */
+  skipSuccessfulRequests?: boolean;
 }
 
 /**
@@ -16,10 +18,12 @@ export function createRateLimiter({
   windowMs,
   limit,
   message = 'Too many requests, please try again later',
+  skipSuccessfulRequests = false,
 }: LimiterOptions) {
   return rateLimit({
     windowMs,
     limit,
+    skipSuccessfulRequests,
     standardHeaders: 'draft-8',
     legacyHeaders: false,
     handler: (_req, _res, next) => next(AppError.tooManyRequests(message)),

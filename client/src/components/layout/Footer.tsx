@@ -1,23 +1,31 @@
 import { Link } from 'react-router';
 import { accountNav, storefrontNav } from '../../config/navigation.ts';
+import { useCurrentUser } from '../../hooks/useAuth.ts';
 import { paths } from '../../routes/paths.ts';
 import { ApiStatus } from './ApiStatus.tsx';
 import { Container } from './Container.tsx';
 
-const columns = [
-  { heading: 'Shop', links: [{ label: 'Shop all', to: paths.products }, ...storefrontNav] },
-  {
+const shopColumn = {
+  heading: 'Shop',
+  links: [{ label: 'Shop all', to: paths.products }, ...storefrontNav],
+};
+
+function accountColumn(signedIn: boolean) {
+  return {
     heading: 'Account',
     links: [
-      { label: 'Sign in', to: paths.login },
+      signedIn ? { label: 'My account', to: paths.account } : { label: 'Sign in', to: paths.login },
       ...accountNav.slice(1),
       { label: 'Wishlist', to: paths.wishlist },
       { label: 'Cart', to: paths.cart },
     ],
-  },
-];
+  };
+}
 
 export function Footer() {
+  const { data: user } = useCurrentUser();
+  const columns = [shopColumn, accountColumn(Boolean(user))];
+
   return (
     <footer className="mt-24 bg-inverse text-inverse-fg">
       <Container className="grid gap-12 py-16 md:grid-cols-12">

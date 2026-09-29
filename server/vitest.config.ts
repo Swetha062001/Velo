@@ -15,6 +15,7 @@ export default defineConfig({
       NODE_ENV: 'test',
       CORS_ORIGIN: 'http://localhost:5173',
       DATABASE_URL: testDatabaseUrl,
+      JWT_SECRET: 'test-only-secret-that-is-at-least-32-characters-long',
     },
     globalSetup: ['tests/globalSetup.ts'],
     setupFiles: ['tests/setup.ts'],
