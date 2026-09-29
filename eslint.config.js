@@ -5,7 +5,16 @@ import reactRefresh from 'eslint-plugin-react-refresh';
 import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
-  { ignores: ['**/dist', '**/coverage', '**/node_modules', 'server/uploads'] },
+  {
+    ignores: [
+      '**/dist',
+      '**/coverage',
+      '**/node_modules',
+      'server/uploads*',
+      'playwright-report',
+      'test-results',
+    ],
+  },
 
   js.configs.recommended,
   ...tseslint.configs.recommended,
@@ -33,7 +42,14 @@ export default tseslint.config(
 
   // Server + config files (Node)
   {
-    files: ['server/**/*.ts', '*.js', 'client/vite.config.ts'],
+    files: [
+      'server/**/*.ts',
+      '*.js',
+      '*.ts',
+      'e2e/**/*.ts',
+      'client/vite.config.ts',
+      'client/vitest.config.ts',
+    ],
     languageOptions: { globals: globals.node },
   },
 );

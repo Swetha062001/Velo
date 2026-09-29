@@ -63,20 +63,21 @@ npm run dev
 
 ## Development commands
 
-| Command              | What it does                                     |
-| -------------------- | ------------------------------------------------ |
-| `npm run dev`        | Start client and server together (watch mode)    |
-| `npm run dev:client` | Start only the Vite client                       |
-| `npm run dev:server` | Start only the API                               |
-| `npm run build`      | Production build of both workspaces              |
-| `npm run typecheck`  | TypeScript check across both workspaces          |
-| `npm run lint`       | ESLint over the whole repo                       |
-| `npm test`           | Run the test suites (server: Vitest + Supertest) |
-| `npm run format`     | Format with Prettier                             |
-| `npm run db:migrate` | Apply pending database migrations                |
-| `npm run db:status`  | Show migration status                            |
-| `npm run db:seed`    | Load demo data into an empty database            |
-| `npm run db:reset`   | Drop, re-migrate and re-seed the dev database    |
+| Command              | What it does                                                                                    |
+| -------------------- | ----------------------------------------------------------------------------------------------- |
+| `npm run dev`        | Start client and server together (watch mode)                                                   |
+| `npm run dev:client` | Start only the Vite client                                                                      |
+| `npm run dev:server` | Start only the API                                                                              |
+| `npm run build`      | Production build of both workspaces                                                             |
+| `npm run typecheck`  | TypeScript check across both workspaces                                                         |
+| `npm run lint`       | ESLint over the whole repo                                                                      |
+| `npm test`           | API + client test suites (Vitest)                                                               |
+| `npm run test:e2e`   | End-to-end browser tests (Playwright, isolated DB) — see [testing](docs/development/testing.md) |
+| `npm run format`     | Format with Prettier                                                                            |
+| `npm run db:migrate` | Apply pending database migrations                                                               |
+| `npm run db:status`  | Show migration status                                                                           |
+| `npm run db:seed`    | Load demo data into an empty database                                                           |
+| `npm run db:reset`   | Drop, re-migrate and re-seed the dev database                                                   |
 
 ## Environment variables
 
@@ -240,6 +241,7 @@ velo/
 └── package.json     npm workspaces + root scripts
 ```
 
+Testing strategy, databases and QA findings: [`docs/development/testing.md`](docs/development/testing.md).
 Backend structure and rules (layers, responses, errors, validation, logging) are documented in
 [`docs/development/backend-conventions.md`](docs/development/backend-conventions.md). Database design: [`docs/database/schema.md`](docs/database/schema.md).
 

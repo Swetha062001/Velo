@@ -16,7 +16,13 @@ export function LoginForm({ onSuccess }: { onSuccess: (user: User) => void }) {
     handleSubmit,
     setError,
     formState: { errors },
-  } = useForm<LoginValues>({ resolver: zodResolver(loginSchema), mode: 'onTouched' });
+  } = useForm<LoginValues>({
+    resolver: zodResolver(loginSchema),
+    // The first field is auto-focused: validating on blur would flash "Enter your email" and
+    // shift the layout as soon as the shopper clicks anything else. Validate on submit, then live.
+    mode: 'onSubmit',
+    reValidateMode: 'onChange',
+  });
 
   const onSubmit = handleSubmit((values) =>
     login.mutate(values, {

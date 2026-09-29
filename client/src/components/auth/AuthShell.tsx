@@ -27,9 +27,8 @@ export function AuthShell({ title, subtitle, children, footer }: AuthShellProps)
         aria-hidden
         className="relative hidden overflow-hidden bg-band p-12 text-band-fg lg:flex lg:flex-col lg:justify-end"
       >
-        <span className="pointer-events-none absolute -top-10 -right-10 font-display text-[18rem] leading-none font-black text-band-fg/[0.05] [font-stretch:125%]">
-          V.
-        </span>
+        {/* Decorative watermark drawn in CSS, so it isn't text (for screen readers or contrast). */}
+        <span className="pointer-events-none absolute -top-10 -right-10 font-display text-[18rem] leading-none font-black text-band-fg/[0.05] [font-stretch:125%] before:content-['V.']" />
         <p className="text-xs font-semibold tracking-[0.2em] text-band-fg/60 uppercase">Members</p>
         <p className="mt-4 max-w-md font-display text-4xl leading-tight font-extrabold [font-stretch:110%]">
           Your wishlist, orders and AI picks — in one place.

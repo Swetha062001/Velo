@@ -25,5 +25,12 @@ export default defineConfig({
     setupFiles: ['tests/setup.ts'],
     // Test files share one database, so run them one at a time.
     fileParallelism: false,
+    coverage: {
+      provider: 'v8',
+      include: ['src/**/*.ts'],
+      // Process entry points: exercised by running the app, not by unit tests.
+      exclude: ['src/server.ts', 'src/db/cli.ts'],
+      reporter: ['text-summary', 'html'],
+    },
   },
 });

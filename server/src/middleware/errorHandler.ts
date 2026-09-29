@@ -58,6 +58,15 @@ export const errorHandler: ErrorRequestHandler = (err, req, res, _next) => {
     return;
   }
 
+  // PostgreSQL rejects text it can't store (e.g. a NUL byte, "\u0000") — the input is bad,
+  // not the server.
+  if (err?.code === '22021' || err?.code === '22P05') {
+    res.status(400).json({
+      error: { code: 'INVALID_CHARACTERS', message: 'The request contains invalid characters' },
+    });
+    return;
+  }
+
   // Unexpected: full detail in the server log, generic message + request id to the client.
   logger.error('Unhandled error', {
     requestId: req.id,

@@ -3,12 +3,12 @@ import { ArrowRight, ArrowUp, Sparkles } from 'lucide-react';
 import { useEffect, useId, useRef, useState, type FormEvent } from 'react';
 import { Link } from 'react-router';
 import { ApiError } from '../../lib/apiClient.ts';
-import { productsUrl, paths } from '../../routes/paths.ts';
+import { paths } from '../../routes/paths.ts';
 import { assistantService } from '../../services/assistant.service.ts';
 import { useUi } from '../../store/ui.ts';
 import type { AssistantReply, AssistantTurn, ShoppingIntent } from '../../types/assistant.ts';
+import { effectiveFilters } from './effectiveFilters.ts';
 import { cn } from '../../utils/cn.ts';
-import { formatRupees } from '../../utils/money.ts';
 import { Drawer } from '../common/Drawer.tsx';
 import { Price } from '../product/Price.tsx';
 import { ProductImage } from '../product/ProductImage.tsx';
@@ -26,37 +26,6 @@ interface Message {
   text: string;
   result?: AssistantReply;
   error?: boolean;
-}
-
-/** Filter chips + a catalogue URL for the filters the answer actually used. */
-function effectiveFilters({ appliedFilters: f, relaxed }: AssistantReply) {
-  const chips: string[] = [];
-  const query: Record<string, string> = {};
-  if (f.category && !relaxed.includes('category')) {
-    chips.push(f.category);
-    query.category = f.category;
-  }
-  if (f.gender && !relaxed.includes('gender')) {
-    chips.push(f.gender);
-    query.gender = f.gender;
-  }
-  if (f.colors.length && !relaxed.includes('colour')) {
-    chips.push(...f.colors);
-    query.color = f.colors.join(',');
-  }
-  if (f.size && !relaxed.includes('size')) {
-    chips.push(`UK ${f.size}`);
-    query.size = f.size;
-  }
-  if (!relaxed.includes('price')) {
-    if (f.minPriceInr !== null && f.maxPriceInr !== null) {
-      chips.push(`${formatRupees(f.minPriceInr)}–${formatRupees(f.maxPriceInr)}`);
-    } else if (f.maxPriceInr !== null) chips.push(`under ${formatRupees(f.maxPriceInr)}`);
-    else if (f.minPriceInr !== null) chips.push(`from ${formatRupees(f.minPriceInr)}`);
-    if (f.minPriceInr !== null) query.minPrice = String(f.minPriceInr);
-    if (f.maxPriceInr !== null) query.maxPrice = String(f.maxPriceInr);
-  }
-  return { chips, url: Object.keys(query).length ? productsUrl(query) : paths.products };
 }
 
 function AnswerBlock({ result, onNavigate }: { result: AssistantReply; onNavigate: () => void }) {

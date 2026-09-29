@@ -16,7 +16,13 @@ export function RegisterForm({ onSuccess }: { onSuccess: () => void }) {
     handleSubmit,
     setError,
     formState: { errors },
-  } = useForm<RegisterValues>({ resolver: zodResolver(registerSchema), mode: 'onTouched' });
+  } = useForm<RegisterValues>({
+    resolver: zodResolver(registerSchema),
+    // The first field is auto-focused: validating on blur would flash "Enter your email" and
+    // shift the layout as soon as the shopper clicks anything else. Validate on submit, then live.
+    mode: 'onSubmit',
+    reValidateMode: 'onChange',
+  });
 
   const onSubmit = handleSubmit((values) =>
     registerUser.mutate(values, {
