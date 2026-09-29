@@ -21,7 +21,12 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "test": "npm run test --workspaces --if-present"
+    "test": "npm run test --workspaces --if-present",
+    "db:migrate": "npm run db:migrate --workspace server",
+    "db:status": "npm run db:status --workspace server",
+    "db:seed": "npm run db:seed --workspace server",
+    "db:reset": "npm run db:reset --workspace server",
+    "db:reset:test": "npm run db:reset:test --workspace server"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

@@ -1,0 +1,27 @@
+[
+  {
+    "name": "Running",
+    "slug": "running",
+    "description": "Responsive cushioning and breathable uppers for daily miles and race day."
+  },
+  {
+    "name": "Lifestyle",
+    "slug": "lifestyle",
+    "description": "Clean, versatile silhouettes designed for everyday wear."
+  },
+  {
+    "name": "Training",
+    "slug": "training",
+    "description": "Stable, grippy platforms built for the gym floor and cross-training."
+  },
+  {
+    "name": "Basketball",
+    "slug": "basketball",
+    "description": "Court-ready support, traction and impact protection."
+  },
+  {
+    "name": "Slides & Sandals",
+    "slug": "slides",
+    "description": "Easy recovery footwear for off-duty days and warm weather."
+  }
+]

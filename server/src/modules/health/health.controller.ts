@@ -1,9 +1,10 @@
 import type { Request, Response } from 'express';
-import { ok } from '../../utils/respond.js';
 import { healthService } from './health.service.js';
 
 export const healthController = {
-  get(_req: Request, res: Response) {
-    ok(res, healthService.getStatus());
+  async get(_req: Request, res: Response) {
+    const health = await healthService.getStatus();
+    // 503 lets uptime monitors detect a missing database; the body still explains why.
+    res.status(health.status === 'ok' ? 200 : 503).json({ data: health });
   },
 };

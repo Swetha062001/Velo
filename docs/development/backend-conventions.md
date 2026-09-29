@@ -75,5 +75,19 @@ with its `requestId`, which is also returned in the `X-Request-Id` header.
 
 ## Tests
 
-`server/tests/*.test.ts` with Vitest + Supertest. Run `npm test`. Tests use a fixed environment
-from `server/vitest.config.ts` and never read `server/.env`.
+`server/tests/*.test.ts` with Vitest + Supertest. Run `npm test`.
+
+- Tests use a fixed environment from `server/vitest.config.ts`; only `TEST_DATABASE_URL` is read
+  from `server/.env`.
+- Before the suite, `tests/globalSetup.ts` drops and re-migrates the test database (it refuses to
+  touch a database whose name doesn't contain `test`).
+- Files run sequentially because they share one database. Use `tests/helpers/db.ts`:
+  `truncateAll()` for a clean slate, `inRollback()` for tests that must leave no data behind.
+
+## Database access
+
+- Repositories use `query()` from `src/db/index.ts` with **parameterised** SQL (`$1, $2 …`).
+  Never build SQL by string-concatenating input.
+- Multi-step writes (e.g. placing an order) use `withTransaction()` in the service; repository
+  functions accept an optional `Queryable` so they can join that transaction.
+- Money is integer paise end to end.
