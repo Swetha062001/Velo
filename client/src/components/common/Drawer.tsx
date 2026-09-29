@@ -9,13 +9,22 @@ interface DrawerProps {
   side?: 'left' | 'right';
   children: ReactNode;
   footer?: ReactNode;
+  width?: 'md' | 'lg';
 }
 
 /**
  * Side panel on the native <dialog> element: focus trap, Esc-to-close and an inert
  * background come from the browser.
  */
-export function Drawer({ open, onClose, title, side = 'right', children, footer }: DrawerProps) {
+export function Drawer({
+  open,
+  onClose,
+  title,
+  side = 'right',
+  children,
+  footer,
+  width = 'md',
+}: DrawerProps) {
   const ref = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
@@ -32,8 +41,9 @@ export function Drawer({ open, onClose, title, side = 'right', children, footer 
       onClose={onClose}
       onClick={(e) => e.target === e.currentTarget && onClose()}
       className={cn(
-        'm-0 h-dvh max-h-none w-[min(24rem,90vw)] max-w-none bg-canvas p-0 text-ink backdrop:bg-black/40',
+        'm-0 h-dvh max-h-none max-w-none bg-canvas p-0 text-ink backdrop:bg-black/40',
         side === 'right' ? 'ml-auto' : 'mr-auto',
+        width === 'lg' ? 'w-[min(28rem,100vw)]' : 'w-[min(24rem,90vw)]',
       )}
     >
       <div className="flex h-full flex-col">

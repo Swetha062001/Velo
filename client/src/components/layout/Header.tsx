@@ -1,5 +1,5 @@
 import type { LucideIcon } from 'lucide-react';
-import { Heart, LayoutDashboard, Menu, Search, ShoppingBag, User } from 'lucide-react';
+import { Heart, LayoutDashboard, Menu, Search, ShoppingBag, Sparkles, User } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router';
 import { storefrontNav } from '../../config/navigation.ts';
@@ -12,6 +12,7 @@ import { Container } from './Container.tsx';
 import { Logo } from './Logo.tsx';
 import { MobileNav } from './MobileNav.tsx';
 import { SearchDialog } from './SearchDialog.tsx';
+import { useUi } from '../../store/ui.ts';
 
 function IconLink({ to, label, icon: Icon }: { to: string; label: string; icon: LucideIcon }) {
   return (
@@ -40,6 +41,7 @@ function CountBadge({ count }: { count: number }) {
 export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const openAssistant = useUi((s) => s.openAssistant);
   const location = useLocation();
   const { data: user } = useCurrentUser();
   const { cart } = useCart();
@@ -99,6 +101,16 @@ export function Header() {
               Admin dashboard
             </Link>
           )}
+          <button
+            type="button"
+            onClick={openAssistant}
+            aria-label="Ask the VELO AI assistant"
+            title="AI assistant"
+            aria-haspopup="dialog"
+            className="inline-flex size-10 items-center justify-center rounded-md text-accent transition-colors hover:bg-surface-muted"
+          >
+            <Sparkles aria-hidden className="size-5" strokeWidth={1.75} />
+          </button>
           <button
             type="button"
             onClick={() => setSearchOpen(true)}

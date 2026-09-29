@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { addressesRouter } from './modules/addresses/addresses.routes.js';
 import { adminRouter } from './modules/admin/admin.routes.js';
+import { aiRouter } from './modules/ai/ai.routes.js';
 import { authRouter } from './modules/auth/auth.routes.js';
 import { cartRouter } from './modules/cart/cart.routes.js';
 import { categoriesRouter } from './modules/categories/categories.routes.js';
@@ -23,4 +24,5 @@ apiRouter.use('/products', productsRouter);
 apiRouter.use('/cart', cartRouter);
 apiRouter.use('/wishlist', wishlistRouter);
 apiRouter.use('/orders', ordersRouter);
+apiRouter.use('/ai', aiRouter);
 apiRouter.use('/admin', adminRouter);

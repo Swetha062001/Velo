@@ -9,6 +9,7 @@ import { ProductGrid, ProductGridSkeleton } from '../../components/product/Produ
 import { ProductImage } from '../../components/product/ProductImage.tsx';
 import { useCategories, useProducts } from '../../hooks/useCatalog.ts';
 import { paths, productsUrl } from '../../routes/paths.ts';
+import { useUi } from '../../store/ui.ts';
 
 const valueProps = [
   { icon: Truck, title: 'Free shipping from ₹2,999', text: 'Flat ₹99 on smaller orders.' },
@@ -17,6 +18,25 @@ const valueProps = [
 ];
 
 const FEATURED_FILTERS = { featured: 'true', limit: '4' } as const;
+
+/** Hero shortcut into the assistant. */
+function AskAssistant() {
+  const openAssistant = useUi((s) => s.openAssistant);
+  return (
+    <button
+      type="button"
+      onClick={openAssistant}
+      aria-haspopup="dialog"
+      className="group mt-6 inline-flex items-center gap-2 text-sm text-ink-muted transition-colors hover:text-ink"
+    >
+      <Sparkles aria-hidden className="size-4 text-accent" />
+      Not sure?{' '}
+      <span className="font-medium text-ink underline decoration-line-strong underline-offset-4 group-hover:decoration-accent">
+        Describe it to our AI assistant
+      </span>
+    </button>
+  );
+}
 
 function HeroFeature() {
   const featured = useProducts(FEATURED_FILTERS);
@@ -170,6 +190,7 @@ export default function HomePage() {
                 New arrivals
               </ButtonLink>
             </div>
+            <AskAssistant />
           </div>
 
           <div className="lg:col-span-5">

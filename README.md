@@ -84,16 +84,21 @@ Real `.env` files are git-ignored. Only the `.env.example` files are committed.
 
 ### `server/.env`
 
-| Variable            | Purpose                                                                      | Example                                                      | Secret  | Where to obtain                                   |
-| ------------------- | ---------------------------------------------------------------------------- | ------------------------------------------------------------ | ------- | ------------------------------------------------- |
-| `PORT`              | Port the API listens on                                                      | `5001`                                                       | No      | Choose any free port                              |
-| `NODE_ENV`          | Runtime mode: `development` \| `test` \| `production`                        | `development`                                                | No      | —                                                 |
-| `CORS_ORIGIN`       | Exact frontend origin allowed to call the API                                | `http://localhost:5173`                                      | No      | The client dev URL                                |
-| `DATABASE_URL`      | PostgreSQL connection for the app and `db:*` commands                        | `postgres://velo:velo_dev_password@localhost:5432/velo_dev`  | **Yes** | Created in [database setup](database/README.md)   |
-| `TEST_DATABASE_URL` | Separate database for tests; wiped on every test run                         | `postgres://velo:velo_dev_password@localhost:5432/velo_test` | **Yes** | Created in [database setup](database/README.md)   |
-| `JWT_SECRET`        | Signs session tokens. Min 32 random characters                               | output of `openssl rand -base64 48`                          | **Yes** | Generate locally; never reuse across environments |
-| `UPLOAD_DIR`        | Folder for uploaded images (relative to `server/`, or absolute). Git-ignored | `uploads`                                                    | No      | Optional; defaults to `uploads`                   |
-| `PUBLIC_SERVER_URL` | Public origin of the API, used to build image URLs                           | `http://localhost:5001`                                      | No      | Optional; defaults to `http://localhost:PORT`     |
+| Variable            | Purpose                                                                                                                   | Example                                                      | Secret  | Where to obtain                                   |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ | ------- | ------------------------------------------------- |
+| `PORT`              | Port the API listens on                                                                                                   | `5001`                                                       | No      | Choose any free port                              |
+| `NODE_ENV`          | Runtime mode: `development` \| `test` \| `production`                                                                     | `development`                                                | No      | —                                                 |
+| `CORS_ORIGIN`       | Exact frontend origin allowed to call the API                                                                             | `http://localhost:5173`                                      | No      | The client dev URL                                |
+| `DATABASE_URL`      | PostgreSQL connection for the app and `db:*` commands                                                                     | `postgres://velo:velo_dev_password@localhost:5432/velo_dev`  | **Yes** | Created in [database setup](database/README.md)   |
+| `TEST_DATABASE_URL` | Separate database for tests; wiped on every test run                                                                      | `postgres://velo:velo_dev_password@localhost:5432/velo_test` | **Yes** | Created in [database setup](database/README.md)   |
+| `JWT_SECRET`        | Signs session tokens. Min 32 random characters                                                                            | output of `openssl rand -base64 48`                          | **Yes** | Generate locally; never reuse across environments |
+| `UPLOAD_DIR`        | Folder for uploaded images (relative to `server/`, or absolute). Git-ignored                                              | `uploads`                                                    | No      | Optional; defaults to `uploads`                   |
+| `PUBLIC_SERVER_URL` | Public origin of the API, used to build image URLs                                                                        | `http://localhost:5001`                                      | No      | Optional; defaults to `http://localhost:PORT`     |
+| `AI_PROVIDER`       | Assistant backend: `ollama` (local open model) \| `openai` (any OpenAI-compatible API) \| `mock` (no model, smart search) | `ollama`                                                     | No      | See [AI assistant](#ai-assistant)                 |
+| `AI_MODEL`          | Model name                                                                                                                | `qwen2.5:3b`                                                 | No      | Optional; per-provider default                    |
+| `AI_BASE_URL`       | Provider URL                                                                                                              | `http://localhost:11434`                                     | No      | Optional; per-provider default                    |
+| `AI_API_KEY`        | Key for hosted OpenAI-compatible providers (not needed for Ollama)                                                        | —                                                            | **Yes** | Provider dashboard; server-side only              |
+| `AI_TIMEOUT_MS`     | Per-call model timeout                                                                                                    | `30000`                                                      | No      | Optional; defaults to 30 s                        |
 
 The server validates these at startup and exits with a clear message if any are invalid.
 
@@ -102,8 +107,6 @@ The server validates these at startup and exits with a clear message if any are 
 | Variable            | Purpose             | Example                        | Secret                                                               |
 | ------------------- | ------------------- | ------------------------------ | -------------------------------------------------------------------- |
 | `VITE_API_BASE_URL` | Base URL of the API | `http://localhost:5001/api/v1` | **No — everything in the client is public. Never put secrets here.** |
-
-Further variables (AI) are added and documented in the phase that introduces them.
 
 ## Authentication
 
@@ -171,6 +174,30 @@ Rules live in `server/src/config/commerce.ts`; pricing logic in `server/src/modu
 - **Orders** — search and filter; move through Processing → Shipped → Delivered with enforced
   transitions; cancelling restocks and refunds.
 - **Users** — order stats and role changes (admins can't change their own role).
+
+## AI assistant
+
+"Ask VELO AI" (floating button, header ✦ icon, home hero) finds pairs from a plain-English
+request — "gym shoes for my sister around 6k", then "any cheaper?". It runs on a **free, open
+model locally** through [Ollama](https://ollama.com); nothing leaves your machine.
+
+```bash
+brew install ollama
+brew services start ollama
+ollama pull qwen2.5:3b          # ~1.9 GB, one time
+```
+
+Then set `AI_PROVIDER=ollama` in `server/.env` and restart. The panel shows **Local AI ·
+qwen2.5:3b** when the model is reachable, otherwise **Smart search mode** — the same answers from
+deterministic rules, so the assistant works with no model at all (`AI_PROVIDER=mock`, the
+default). Any Ollama model can be used via `AI_MODEL` (e.g. `llama3.2:3b`, `qwen2.5:7b`).
+
+Guardrails: the model never queries the database and can only pick from products the server
+retrieved; explicit constraints (budget, colour, gender, size) come from rules, not the model;
+every pick and sentence is validated, and prices, names, images and stock always come from the
+database. Details: [`docs/api/ai.md`](docs/api/ai.md).
+
+To remove Ollama: `brew services stop ollama && brew uninstall ollama && rm -rf ~/.ollama`.
 
 ## Theme
 

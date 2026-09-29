@@ -15,6 +15,15 @@ const envSchema = z.object({
   UPLOAD_DIR: z.string().min(1).default('uploads'),
   /** Public origin of this API, used to build uploaded-image URLs. Defaults to localhost:PORT. */
   PUBLIC_SERVER_URL: z.url().optional(),
+  /** AI assistant: 'ollama' (local open models), 'openai' (any OpenAI-compatible API) or 'mock'. */
+  AI_PROVIDER: z.enum(['ollama', 'openai', 'mock']).default('mock'),
+  /** Model name, e.g. qwen2.5:3b (Ollama) or a hosted model id. */
+  AI_MODEL: z.string().min(1).optional(),
+  /** Provider endpoint. Defaults: Ollama http://localhost:11434, OpenAI-compatible https://api.openai.com/v1 */
+  AI_BASE_URL: z.url().optional(),
+  /** Only for hosted OpenAI-compatible providers. Never sent to the browser. */
+  AI_API_KEY: z.string().optional(),
+  AI_TIMEOUT_MS: z.coerce.number().int().min(1000).max(120_000).default(30_000),
   JWT_SECRET: z
     .string()
     .min(32, 'Must be at least 32 characters — generate with: openssl rand -base64 48')

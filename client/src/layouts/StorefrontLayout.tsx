@@ -1,4 +1,5 @@
 import { Outlet } from 'react-router';
+import { AssistantLauncher, AssistantPanel } from '../components/assistant/AssistantPanel.tsx';
 import { CartDrawer } from '../components/cart/CartDrawer.tsx';
 import { Footer } from '../components/layout/Footer.tsx';
 import { Header } from '../components/layout/Header.tsx';
@@ -14,6 +15,8 @@ export default function StorefrontLayout() {
       </main>
       <Footer />
       <CartDrawer />
+      <AssistantPanel />
+      <AssistantLauncher />
     </div>
   );
 }
