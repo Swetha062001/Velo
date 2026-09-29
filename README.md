@@ -2,7 +2,7 @@
 
 AI-powered full-stack ecommerce platform for a fictional premium sneaker brand.
 
-> **Status:** Phase 10 — admin dashboard. This README grows with each phase; the complete
+> **Status:** Phase 11 — image uploads. This README grows with each phase; the complete
 > version (API overview, AI architecture, testing, troubleshooting) lands in Phase 15.
 
 ## Technology stack
@@ -84,14 +84,16 @@ Real `.env` files are git-ignored. Only the `.env.example` files are committed.
 
 ### `server/.env`
 
-| Variable            | Purpose                                               | Example                                                      | Secret  | Where to obtain                                   |
-| ------------------- | ----------------------------------------------------- | ------------------------------------------------------------ | ------- | ------------------------------------------------- |
-| `PORT`              | Port the API listens on                               | `5001`                                                       | No      | Choose any free port                              |
-| `NODE_ENV`          | Runtime mode: `development` \| `test` \| `production` | `development`                                                | No      | —                                                 |
-| `CORS_ORIGIN`       | Exact frontend origin allowed to call the API         | `http://localhost:5173`                                      | No      | The client dev URL                                |
-| `DATABASE_URL`      | PostgreSQL connection for the app and `db:*` commands | `postgres://velo:velo_dev_password@localhost:5432/velo_dev`  | **Yes** | Created in [database setup](database/README.md)   |
-| `TEST_DATABASE_URL` | Separate database for tests; wiped on every test run  | `postgres://velo:velo_dev_password@localhost:5432/velo_test` | **Yes** | Created in [database setup](database/README.md)   |
-| `JWT_SECRET`        | Signs session tokens. Min 32 random characters        | output of `openssl rand -base64 48`                          | **Yes** | Generate locally; never reuse across environments |
+| Variable            | Purpose                                                                      | Example                                                      | Secret  | Where to obtain                                   |
+| ------------------- | ---------------------------------------------------------------------------- | ------------------------------------------------------------ | ------- | ------------------------------------------------- |
+| `PORT`              | Port the API listens on                                                      | `5001`                                                       | No      | Choose any free port                              |
+| `NODE_ENV`          | Runtime mode: `development` \| `test` \| `production`                        | `development`                                                | No      | —                                                 |
+| `CORS_ORIGIN`       | Exact frontend origin allowed to call the API                                | `http://localhost:5173`                                      | No      | The client dev URL                                |
+| `DATABASE_URL`      | PostgreSQL connection for the app and `db:*` commands                        | `postgres://velo:velo_dev_password@localhost:5432/velo_dev`  | **Yes** | Created in [database setup](database/README.md)   |
+| `TEST_DATABASE_URL` | Separate database for tests; wiped on every test run                         | `postgres://velo:velo_dev_password@localhost:5432/velo_test` | **Yes** | Created in [database setup](database/README.md)   |
+| `JWT_SECRET`        | Signs session tokens. Min 32 random characters                               | output of `openssl rand -base64 48`                          | **Yes** | Generate locally; never reuse across environments |
+| `UPLOAD_DIR`        | Folder for uploaded images (relative to `server/`, or absolute). Git-ignored | `uploads`                                                    | No      | Optional; defaults to `uploads`                   |
+| `PUBLIC_SERVER_URL` | Public origin of the API, used to build image URLs                           | `http://localhost:5001`                                      | No      | Optional; defaults to `http://localhost:PORT`     |
 
 The server validates these at startup and exits with a clear message if any are invalid.
 
@@ -101,7 +103,7 @@ The server validates these at startup and exits with a clear message if any are 
 | ------------------- | ------------------- | ------------------------------ | -------------------------------------------------------------------- |
 | `VITE_API_BASE_URL` | Base URL of the API | `http://localhost:5001/api/v1` | **No — everything in the client is public. Never put secrets here.** |
 
-Further variables (AI, image storage) are added and documented in the phase that introduces them.
+Further variables (AI) are added and documented in the phase that introduces them.
 
 ## Authentication
 
@@ -157,6 +159,10 @@ Rules live in `server/src/config/commerce.ts`; pricing logic in `server/src/modu
 
 - **Dashboard** — revenue, orders, customers, products, orders by status, 14-day revenue chart,
   low-stock alerts and recent orders.
+- **Images** — drag-and-drop or browse to upload JPEG/PNG/WebP (≤ 5 MB, verified by file
+  signature), or link https images. Files are stored through a `StorageProvider` interface —
+  local disk now (`server/uploads/`), swappable for S3 / Supabase Storage without code changes —
+  and deleted when no longer used.
 - **Products** — create (with images and a UK size run), edit, publish / unpublish / archive,
   image ordering, sizes with SKU, price override, stock and low-stock level. Products that have
   been ordered can be archived but not deleted.

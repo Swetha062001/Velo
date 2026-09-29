@@ -27,6 +27,17 @@ async function paged<T>(path: string, query: Query, signal?: AbortSignal): Promi
 export const adminService = {
   stats: (signal?: AbortSignal) => api.get<AdminStats>('/admin/stats', { signal }),
 
+  /** Uploads one image; returns its public URL to save on a product or category. */
+  uploadImage(file: File, folder: 'products' | 'categories' = 'products') {
+    const form = new FormData();
+    form.append('file', file);
+    return api.post<{ url: string; key: string; contentType: string; size: number }>(
+      '/admin/uploads/images',
+      form,
+      { query: { folder } },
+    );
+  },
+
   // Products
   listProducts: (q: Query, signal?: AbortSignal) =>
     paged<AdminProductListItem>('/admin/products', q, signal),

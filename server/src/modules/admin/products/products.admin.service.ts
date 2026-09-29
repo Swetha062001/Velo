@@ -2,6 +2,7 @@ import { withTransaction } from '../../../db/index.js';
 import { AppError } from '../../../utils/AppError.js';
 import { mapConstraintError } from '../../../utils/dbErrors.js';
 import { paginationMeta, toOffset } from '../../../utils/pagination.js';
+import { deleteUnreferencedUploads } from '../uploads/uploads.cleanup.js';
 import {
   adminProductsRepository as repo,
   type AdminProductRow,
@@ -151,12 +152,17 @@ export const adminProductsService = {
         'This product has been ordered and can’t be deleted. Archive it instead.',
       );
     }
+    const images = await repo.findImages(id);
     await repo.delete(id);
+    await deleteUnreferencedUploads(images.map((i) => i.url));
   },
 
   async replaceImages(id: string, images: ImageInput[]) {
     await requireProduct(id);
+    const previous = await repo.findImages(id);
     await withTransaction((client) => repo.replaceImages(id, images, client));
+    // After the commit: remove uploaded files that are no longer used anywhere.
+    await deleteUnreferencedUploads(previous.map((i) => i.url));
     return loadDetail(id);
   },
 

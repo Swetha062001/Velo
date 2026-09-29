@@ -117,6 +117,9 @@ function CreateProduct({ categories }: { categories: AdminCategory[] }) {
     { onSuccess: (p) => navigate(paths.adminProduct(p.id), { replace: true }) },
   );
 
+  const [watchedName, watchedColorway] = form.watch(['name', 'colorway']);
+  const createAlt = [watchedName, watchedColorway].filter(Boolean).join(' in ');
+
   const fillRun = () => {
     const { name, colorway } = form.getValues();
     const prefix = skuPrefix(name, colorway);
@@ -129,7 +132,8 @@ function CreateProduct({ categories }: { categories: AdminCategory[] }) {
     );
   };
 
-  const onSubmit = form.handleSubmit((values) =>
+  const onSubmit = form.handleSubmit((values) => {
+    if (images.some((i) => !i.altText.trim())) return; // ImagesEditor shows the message
     create.mutate(
       {
         ...toProductInput(values),
@@ -144,8 +148,8 @@ function CreateProduct({ categories }: { categories: AdminCategory[] }) {
           })),
       },
       { onError: (err) => applyProductErrors(err, form.setError) },
-    ),
-  );
+    );
+  });
 
   const errorCount = Object.keys(form.formState.errors).length;
 
@@ -164,8 +168,8 @@ function CreateProduct({ categories }: { categories: AdminCategory[] }) {
         />
       </Panel>
 
-      <Panel title="Images" description="https image URLs; the first is the primary image.">
-        <ImagesEditor images={images} onChange={setImages} />
+      <Panel title="Images" description="Upload or link images; the first is the primary image.">
+        <ImagesEditor images={images} onChange={setImages} defaultAlt={createAlt} />
       </Panel>
 
       <Panel
@@ -316,7 +320,11 @@ function ImagesPanel({ product }: { product: AdminProduct }) {
           {errorMessage(save.error)}
         </Alert>
       )}
-      <ImagesEditor images={images} onChange={setImages} />
+      <ImagesEditor
+        images={images}
+        onChange={setImages}
+        defaultAlt={`${product.name} in ${product.colorway}`}
+      />
     </Panel>
   );
 }

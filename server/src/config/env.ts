@@ -11,6 +11,10 @@ const envSchema = z.object({
   DATABASE_URL: postgresUrl,
   // Only needed for `npm run db:*:test` and the test suite.
   TEST_DATABASE_URL: postgresUrl.optional(),
+  /** Where uploaded images are stored (relative to the server folder, or absolute). */
+  UPLOAD_DIR: z.string().min(1).default('uploads'),
+  /** Public origin of this API, used to build uploaded-image URLs. Defaults to localhost:PORT. */
+  PUBLIC_SERVER_URL: z.url().optional(),
   JWT_SECRET: z
     .string()
     .min(32, 'Must be at least 32 characters — generate with: openssl rand -base64 48')
@@ -28,5 +32,10 @@ if (!parsed.success) {
   process.exit(1);
 }
 
-export const env = parsed.data;
+export const env = {
+  ...parsed.data,
+  PUBLIC_SERVER_URL: (
+    parsed.data.PUBLIC_SERVER_URL ?? `http://localhost:${parsed.data.PORT}`
+  ).replace(/\/$/, ''),
+};
 export const isProduction = env.NODE_ENV === 'production';

@@ -48,6 +48,7 @@ async function requestEnvelope<T, M>(
   options: RequestOptions = {},
 ): Promise<Envelope<T, M>> {
   const { query, body, signal } = options;
+  const isFormData = body instanceof FormData;
 
   let res: Response;
   try {
@@ -57,9 +58,10 @@ async function requestEnvelope<T, M>(
       credentials: 'include', // send the httpOnly auth cookie
       headers: {
         Accept: 'application/json',
-        ...(body !== undefined && { 'Content-Type': 'application/json' }),
+        // FormData sets its own multipart Content-Type (with boundary).
+        ...(body !== undefined && !isFormData && { 'Content-Type': 'application/json' }),
       },
-      body: body === undefined ? undefined : JSON.stringify(body),
+      body: body === undefined ? undefined : isFormData ? body : JSON.stringify(body),
     });
   } catch (err) {
     if (err instanceof DOMException && err.name === 'AbortError') throw err;

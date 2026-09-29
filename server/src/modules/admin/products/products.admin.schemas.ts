@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { slugSchema } from '../../../schemas/common.js';
+import { storage } from '../../../storage/index.js';
 import { paginationQuerySchema } from '../../../utils/pagination.js';
 
 const optional = <T extends z.ZodType>(schema: T) =>
@@ -11,11 +12,14 @@ const paise = z
   .min(100, 'Minimum ₹1')
   .max(10_000_000, 'Maximum ₹1,00,000');
 
-/** Only https URLs (e.g. CDN / Unsplash); local uploads are added in Phase 11. */
+/** External https URLs (CDN / Unsplash) or files uploaded through /admin/uploads/images. */
 export const imageUrlSchema = z
   .url('Enter a valid URL')
   .max(1000)
-  .refine((u) => u.startsWith('https://'), 'Image URLs must use https');
+  .refine(
+    (u) => u.startsWith('https://') || storage.keyFromUrl(u) !== null,
+    'Use an https:// image URL or upload an image',
+  );
 
 export const imageInputSchema = z.object({
   url: imageUrlSchema,

@@ -1,4 +1,6 @@
 import { existsSync, readFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import path from 'node:path';
 import { parseEnv } from 'node:util';
 import { defineConfig } from 'vitest/config';
 
@@ -16,6 +18,8 @@ export default defineConfig({
       CORS_ORIGIN: 'http://localhost:5173',
       DATABASE_URL: testDatabaseUrl,
       JWT_SECRET: 'test-only-secret-that-is-at-least-32-characters-long',
+      // Uploads in tests go to a throwaway folder, never server/uploads.
+      UPLOAD_DIR: path.join(tmpdir(), 'velo-test-uploads'),
     },
     globalSetup: ['tests/globalSetup.ts'],
     setupFiles: ['tests/setup.ts'],

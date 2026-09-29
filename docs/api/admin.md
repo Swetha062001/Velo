@@ -56,6 +56,40 @@ List endpoints accept `page` / `limit` and return `meta: { page, limit, total, t
 Revenue excludes cancelled orders. `revenueByDay` covers the last 14 days in India time
 (Asia/Kolkata), zero-filled. Low stock = active sizes of live products at or below their threshold.
 
+## Uploads
+
+### `POST /admin/uploads/images?folder=products|categories`
+
+`multipart/form-data` with one file in the field **`file`**. Rate limit: 100 / 15 min.
+
+- Accepted: **JPEG, PNG, WebP**, up to **5 MB**. The type is detected from the file's bytes —
+  the filename and browser MIME type are ignored, so a renamed script is rejected.
+- Stored under a random UUID name (user filenames never touch disk) and served from
+  `/uploads/<folder>/<uuid>.<ext>` with long-lived immutable caching, `nosniff`, a
+  `default-src 'none'` CSP and `Cross-Origin-Resource-Policy: cross-origin`.
+
+**201**
+
+```json
+{
+  "data": {
+    "url": "http://localhost:5001/uploads/products/5b4a….jpg",
+    "key": "products/5b4a….jpg",
+    "contentType": "image/jpeg",
+    "size": 48213
+  }
+}
+```
+
+Save the returned `url` on a product (`PUT /admin/products/:id/images`) or category
+(`imageUrl`). Image fields accept either these upload URLs or external `https://` URLs.
+
+When an image is removed from a product/category (or the product/category is deleted), its
+uploaded file is deleted — unless another product or category still uses it.
+
+**Errors** — `400 UNSUPPORTED_FILE` (not JPEG/PNG/WebP), `400 INVALID_UPLOAD` (missing or
+wrong field), `413 FILE_TOO_LARGE`.
+
 ## Products
 
 | Method   | URL                            | Body / query                                                      | Success                                                                                  |

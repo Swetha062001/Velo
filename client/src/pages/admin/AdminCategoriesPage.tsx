@@ -1,6 +1,8 @@
 import { Plus } from 'lucide-react';
 import { useState, type FormEvent } from 'react';
 import { AdminPage, Panel, Table, Td, Th } from '../../components/admin/AdminUI.tsx';
+import { ImageDropzone } from '../../components/admin/ImageDropzone.tsx';
+import { ProductImage } from '../../components/product/ProductImage.tsx';
 import { Alert } from '../../components/common/Alert.tsx';
 import { Badge } from '../../components/common/Badge.tsx';
 import { Button } from '../../components/common/Button.tsx';
@@ -56,12 +58,28 @@ function CategoryForm({ category, onDone }: { category?: AdminCategory; onDone: 
           onChange={(e) => setSortOrder(e.target.value)}
         />
       </div>
-      <Input
-        label="Cover image URL (optional)"
-        placeholder="https://…"
-        value={imageUrl}
-        onChange={(e) => setImageUrl(e.target.value)}
-      />
+      <div className="grid items-start gap-4 sm:grid-cols-[8rem_1fr]">
+        <div className="aspect-[3/4] overflow-hidden rounded-md bg-surface-muted">
+          {imageUrl && (
+            <ProductImage src={imageUrl} alt="" width={240} className="size-full object-cover" />
+          )}
+        </div>
+        <div className="space-y-3">
+          <ImageDropzone
+            compact
+            multiple={false}
+            maxFiles={1}
+            folder="categories"
+            onUploaded={(url) => setImageUrl(url)}
+          />
+          <Input
+            label="Cover image URL (optional)"
+            placeholder="https://… or upload above"
+            value={imageUrl}
+            onChange={(e) => setImageUrl(e.target.value)}
+          />
+        </div>
+      </div>
       <Textarea
         label="Description (optional)"
         rows={2}

@@ -4,6 +4,7 @@ import { slugSchema } from '../../../schemas/common.js';
 import { AppError } from '../../../utils/AppError.js';
 import { mapConstraintError } from '../../../utils/dbErrors.js';
 import { imageUrlSchema, slugify } from '../products/index.js';
+import { deleteUnreferencedUploads } from '../uploads/uploads.cleanup.js';
 
 /* ── Schemas ─────────────────────────────────────────────────────────────── */
 
@@ -103,6 +104,7 @@ export const adminCategoriesService = {
   },
 
   async update(id: string, input: UpdateCategoryInput) {
+    const before = await findById(id);
     const params: unknown[] = [id];
     const sets: string[] = [];
     for (const [key, column] of Object.entries(COLUMN) as Array<
@@ -121,6 +123,9 @@ export const adminCategoriesService = {
     }
     const row = await findById(id);
     if (!row) throw AppError.notFound('Category not found');
+    if (before?.image_url && before.image_url !== row.image_url) {
+      await deleteUnreferencedUploads([before.image_url]);
+    }
     return toDto(row);
   },
 
@@ -136,5 +141,6 @@ export const adminCategoriesService = {
       );
     }
     await query(`DELETE FROM categories WHERE id = $1`, [id]);
+    if (row.image_url) await deleteUnreferencedUploads([row.image_url]);
   },
 };

@@ -19,7 +19,15 @@ import {
   variantIdParam,
   variantInputSchema,
 } from './products/products.admin.schemas.js';
+import { imageUpload, uploadQuerySchema, uploadsController } from './uploads/uploads.admin.js';
 import { listAdminUsersQuerySchema, updateRoleSchema } from './users/users.admin.js';
+import { createRateLimiter } from '../../middleware/rateLimit.js';
+
+const uploadLimiter = createRateLimiter({
+  windowMs: 15 * 60 * 1000,
+  limit: 100,
+  message: 'Too many uploads. Please wait a few minutes.',
+});
 
 /**
  * Every /admin endpoint sits behind this guard: 401 when signed out, 403 for non-admins.
@@ -30,6 +38,15 @@ export const adminRouter = Router();
 adminRouter.use(authenticate, requireRole('ADMIN'));
 
 adminRouter.get('/stats', c.stats);
+
+// Image uploads (multipart). The file is verified by its bytes before it is stored.
+adminRouter.post(
+  '/uploads/images',
+  uploadLimiter,
+  validate({ query: uploadQuerySchema }),
+  imageUpload,
+  uploadsController.uploadImage,
+);
 
 // Products, images, sizes
 adminRouter.get('/products', validate({ query: listAdminProductsQuerySchema }), c.listProducts);

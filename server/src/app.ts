@@ -7,6 +7,7 @@ import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
 import { apiRateLimiter } from './middleware/rateLimit.js';
 import { requestId, requestLogger } from './middleware/requestContext.js';
 import { apiRouter } from './routes.js';
+import { localStorage, UPLOADS_ROUTE } from './storage/index.js';
 
 export function createApp() {
   const app = express();
@@ -24,6 +25,24 @@ export function createApp() {
       exposedHeaders: ['X-Request-Id'],
     }),
   );
+  // Uploaded images. Filenames are random UUIDs, so responses can be cached forever.
+  // CORP cross-origin lets the storefront (another port/origin) display them; the strict CSP
+  // and nosniff stop a file from ever being interpreted as a page or script.
+  app.use(
+    UPLOADS_ROUTE,
+    express.static(localStorage.rootDir, {
+      index: false,
+      dotfiles: 'deny',
+      immutable: true,
+      maxAge: '365d',
+      setHeaders: (res) => {
+        res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+        res.setHeader('Content-Security-Policy', "default-src 'none'");
+        res.setHeader('X-Content-Type-Options', 'nosniff');
+      },
+    }),
+  );
+
   app.use(express.json({ limit: '100kb' }));
   app.use(cookieParser());
 
