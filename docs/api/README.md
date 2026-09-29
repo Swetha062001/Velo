@@ -2,16 +2,16 @@
 
 Base URL (local): `http://localhost:5001/api/v1`
 
-| Area                    | Doc                |
-| ----------------------- | ------------------ |
-| Health                  | [below](#health)   |
-| Authentication, profile | [auth.md](auth.md) |
-| Products, categories    | _Phase 6_          |
-| Cart                    | _Phase 7_          |
-| Wishlist                | _Phase 8_          |
-| Orders                  | _Phase 9_          |
-| Admin                   | _Phase 10_         |
-| AI assistant            | _Phase 12_         |
+| Area                    | Doc                      |
+| ----------------------- | ------------------------ |
+| Health                  | [below](#health)         |
+| Authentication, profile | [auth.md](auth.md)       |
+| Products, categories    | [catalog.md](catalog.md) |
+| Cart                    | _Phase 7_                |
+| Wishlist                | _Phase 8_                |
+| Orders                  | _Phase 9_                |
+| Admin                   | _Phase 10_               |
+| AI assistant            | _Phase 12_               |
 
 ## Conventions
 

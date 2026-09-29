@@ -2,22 +2,141 @@ import { ArrowUpRight, RotateCcw, Sparkles, Truck } from 'lucide-react';
 import { Link } from 'react-router';
 import { ButtonLink } from '../../components/common/Button.tsx';
 import { DocumentTitle } from '../../components/common/DocumentTitle.tsx';
+import { Skeleton } from '../../components/common/Skeleton.tsx';
 import { Container } from '../../components/layout/Container.tsx';
+import { Price } from '../../components/product/Price.tsx';
+import { ProductGrid, ProductGridSkeleton } from '../../components/product/ProductGrid.tsx';
+import { ProductImage } from '../../components/product/ProductImage.tsx';
+import { useCategories, useProducts } from '../../hooks/useCatalog.ts';
 import { paths, productsUrl } from '../../routes/paths.ts';
-
-// Slugs match the categories seeded in Phase 4. Product imagery arrives in Phase 6.
-const categories = [
-  { name: 'Running', slug: 'running', blurb: 'Responsive cushioning for daily miles.' },
-  { name: 'Lifestyle', slug: 'lifestyle', blurb: 'Clean silhouettes for every day.' },
-  { name: 'Training', slug: 'training', blurb: 'Stable platforms for the gym floor.' },
-  { name: 'Basketball', slug: 'basketball', blurb: 'Support and grip on the court.' },
-];
 
 const valueProps = [
   { icon: Truck, title: 'Free shipping over ₹2,999', text: 'Flat ₹99 on smaller orders.' },
   { icon: RotateCcw, title: '30-day returns', text: 'Unworn pairs, no questions asked.' },
   { icon: Sparkles, title: 'AI shopping assistant', text: 'Describe it — we find the pair.' },
 ];
+
+const FEATURED_FILTERS = { featured: 'true', limit: '4' } as const;
+
+function HeroFeature() {
+  const featured = useProducts(FEATURED_FILTERS);
+  const product = featured.data?.items[0];
+  const image = product?.images[0];
+
+  if (featured.isPending) {
+    return (
+      <Skeleton className="aspect-[4/3] w-full rounded-lg sm:aspect-[16/10] lg:aspect-[4/5]" />
+    );
+  }
+  if (!product) return null;
+
+  return (
+    <Link
+      to={paths.product(product.slug)}
+      className="group relative block aspect-[4/3] overflow-hidden rounded-lg bg-inverse sm:aspect-[16/10] lg:aspect-[4/5]"
+    >
+      {image && (
+        <ProductImage
+          src={image.url}
+          alt={image.alt}
+          width={960}
+          sizes="(min-width: 1024px) 40vw, 100vw"
+          loading="eager"
+          className="absolute inset-0 size-full object-cover transition-transform duration-700 ease-velo group-hover:scale-[1.03]"
+        />
+      )}
+      {/* Scrim keeps the overlaid text legible on any photo. */}
+      <div
+        aria-hidden
+        className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent"
+      />
+      <span className="absolute top-5 left-5 rounded-xs bg-canvas px-2 py-1 text-[0.65rem] font-semibold tracking-[0.18em] text-ink uppercase">
+        Featured
+      </span>
+      <div className="absolute inset-x-0 bottom-0 p-6 text-white sm:p-8">
+        <p className="font-display text-3xl font-extrabold [font-stretch:110%]">{product.name}</p>
+        <p className="mt-1 text-sm text-white/80">{product.colorway}</p>
+        <div className="mt-4 flex items-center justify-between gap-4">
+          <Price
+            pricePaise={product.pricePaise}
+            compareAtPricePaise={product.compareAtPricePaise}
+            className="[&_*]:text-white"
+          />
+          <span className="inline-flex items-center gap-1.5 text-sm font-semibold">
+            Shop now
+            <ArrowUpRight
+              aria-hidden
+              className="size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+            />
+          </span>
+        </div>
+      </div>
+    </Link>
+  );
+}
+
+function CategoryTiles() {
+  const { data: categories, isPending } = useCategories();
+
+  if (isPending) {
+    return (
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
+        {Array.from({ length: 5 }, (_, i) => (
+          <Skeleton
+            key={i}
+            className={`aspect-[3/4] w-full rounded-lg ${i === 0 ? 'col-span-2 aspect-[16/9] lg:col-span-1 lg:aspect-[3/4]' : ''}`}
+          />
+        ))}
+      </div>
+    );
+  }
+
+  return (
+    <ul className="grid grid-cols-2 gap-4 lg:grid-cols-5">
+      {categories?.map((c, i) => (
+        <li key={c.slug} className={i === 0 ? 'col-span-2 lg:col-span-1' : undefined}>
+          <Link
+            to={productsUrl({ category: c.slug })}
+            className={`group relative block overflow-hidden rounded-lg bg-surface-muted ${i === 0 ? 'aspect-[16/9] lg:aspect-[3/4]' : 'aspect-[3/4]'}`}
+          >
+            {c.imageUrl && (
+              <ProductImage
+                src={c.imageUrl}
+                alt=""
+                width={640}
+                sizes="(min-width: 1024px) 20vw, 50vw"
+                className="absolute inset-0 size-full object-cover transition-transform duration-700 ease-velo group-hover:scale-105"
+              />
+            )}
+            <div
+              aria-hidden
+              className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/0 to-transparent"
+            />
+            <div className="absolute inset-x-0 bottom-0 flex items-end justify-between p-4 text-white">
+              <span>
+                <span className="block font-display text-xl font-extrabold">{c.name}</span>
+                <span className="text-xs text-white/75">
+                  {c.productCount} {c.productCount === 1 ? 'style' : 'styles'}
+                </span>
+              </span>
+              <ArrowUpRight
+                aria-hidden
+                className="size-5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+              />
+            </div>
+          </Link>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function FeaturedProducts() {
+  const featured = useProducts(FEATURED_FILTERS);
+  if (featured.isPending) return <ProductGridSkeleton count={4} columns={4} />;
+  if (!featured.data?.items.length) return null;
+  return <ProductGrid products={featured.data.items} columns={4} />;
+}
 
 export default function HomePage() {
   return (
@@ -47,39 +166,14 @@ export default function HomePage() {
               <ButtonLink to={paths.products} size="lg">
                 Shop the collection
               </ButtonLink>
-              <ButtonLink to={productsUrl({ category: 'running' })} size="lg" variant="secondary">
-                Explore running
+              <ButtonLink to={productsUrl({ sort: 'newest' })} size="lg" variant="secondary">
+                New arrivals
               </ButtonLink>
             </div>
           </div>
 
           <div className="lg:col-span-5">
-            <div className="relative flex aspect-[4/3] flex-col sm:aspect-[16/10] lg:aspect-[4/5] justify-between overflow-hidden rounded-lg bg-inverse p-6 text-inverse-fg sm:p-8">
-              <span className="text-xs font-semibold tracking-[0.2em] text-inverse-fg/60 uppercase">
-                Featured
-              </span>
-              <span
-                aria-hidden
-                className="pointer-events-none absolute -right-6 bottom-16 font-display text-[12rem] leading-none font-black text-inverse-fg/[0.06] [font-stretch:125%] sm:text-[16rem]"
-              >
-                01
-              </span>
-              <div className="relative">
-                <p className="font-display text-3xl font-extrabold [font-stretch:110%]">
-                  VELO Aero One
-                </p>
-                <p className="mt-2 text-sm text-inverse-fg/70">
-                  Lightweight knit upper. Featherlight foam. Everyday speed.
-                </p>
-                <Link
-                  to={productsUrl({ q: 'aero one' })}
-                  className="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-inverse-fg underline-offset-4 hover:underline"
-                >
-                  Discover
-                  <ArrowUpRight aria-hidden className="size-4 text-accent" />
-                </Link>
-              </div>
-            </div>
+            <HeroFeature />
           </div>
         </Container>
       </section>
@@ -87,42 +181,41 @@ export default function HomePage() {
       {/* Categories */}
       <section aria-labelledby="categories-heading">
         <Container className="py-16 sm:py-20">
-          <div className="flex items-end justify-between gap-4">
+          <div className="mb-10 flex items-end justify-between gap-4">
             <h2 id="categories-heading" className="text-3xl font-extrabold sm:text-4xl">
               Shop by category
             </h2>
             <Link
               to={paths.products}
-              className="hidden text-sm font-semibold underline-offset-4 hover:underline sm:inline"
+              className="text-sm font-semibold underline-offset-4 hover:underline"
             >
               View all
             </Link>
           </div>
+          <CategoryTiles />
+        </Container>
+      </section>
 
-          <ul className="mt-10 grid gap-px overflow-hidden rounded-lg border border-line bg-line sm:grid-cols-2 lg:grid-cols-4">
-            {categories.map((c, i) => (
-              <li key={c.slug} className="bg-surface">
-                <Link
-                  to={productsUrl({ category: c.slug })}
-                  className="group flex h-full min-h-56 flex-col justify-between p-6 transition-colors hover:bg-surface-muted"
-                >
-                  <span className="text-xs font-semibold text-ink-subtle tabular-nums">
-                    0{i + 1}
-                  </span>
-                  <span>
-                    <span className="flex items-center justify-between font-display text-2xl font-extrabold">
-                      {c.name}
-                      <ArrowUpRight
-                        aria-hidden
-                        className="size-5 text-ink-muted transition-transform duration-200 ease-velo group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-accent"
-                      />
-                    </span>
-                    <span className="mt-2 block text-sm text-ink-muted">{c.blurb}</span>
-                  </span>
-                </Link>
-              </li>
-            ))}
-          </ul>
+      {/* Featured */}
+      <section aria-labelledby="featured-heading" className="border-t border-line">
+        <Container className="py-16 sm:py-20">
+          <div className="mb-10 flex items-end justify-between gap-4">
+            <div>
+              <p className="text-xs font-semibold tracking-[0.2em] text-ink-muted uppercase">
+                Editor&apos;s picks
+              </p>
+              <h2 id="featured-heading" className="mt-2 text-3xl font-extrabold sm:text-4xl">
+                Featured
+              </h2>
+            </div>
+            <Link
+              to={paths.products}
+              className="text-sm font-semibold underline-offset-4 hover:underline"
+            >
+              Shop all
+            </Link>
+          </div>
+          <FeaturedProducts />
         </Container>
       </section>
 

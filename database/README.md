@@ -101,6 +101,7 @@ npm run db:reset
 - **5 categories:** Running, Lifestyle, Training, Basketball, Slides & Sandals
 - **20 fictional VELO products** (19 active, 1 draft) with original descriptions, prices in INR,
   colour, colourway, material, gender and tags
+- **2–3 images per product** and a cover image per category (Unsplash URLs)
 - **6 UK sizes per product** (SKU per size) with deterministic stock — some sizes are low or sold
   out on purpose so stock handling is visible
 - **2 development accounts** and a default address for the customer
@@ -108,7 +109,8 @@ npm run db:reset
 Edit `seeds/categories.json` / `seeds/products.json` to change the catalogue. Prices are in whole
 rupees there (`priceInr`) and stored as paise. The files are validated before anything is inserted.
 
-Product images are added to the seed in Phase 6.
+Each product has 2–3 image URLs (`images` in `products.json`) and each category a cover image
+(`imageUrl`). They point at Unsplash; see the image credits in the root README.
 
 ### Development accounts
 

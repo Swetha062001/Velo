@@ -1,4 +1,5 @@
 import { rateLimit } from 'express-rate-limit';
+import { isProduction } from '../config/env.js';
 import { AppError } from '../utils/AppError.js';
 
 interface LimiterOptions {
@@ -30,5 +31,12 @@ export function createRateLimiter({
   });
 }
 
-/** Baseline limit for the whole API. Stricter limiters (login, AI) are added per route. */
-export const apiRateLimiter = createRateLimiter({ windowMs: 15 * 60 * 1000, limit: 600 });
+/**
+ * Baseline limit for the whole API. Stricter limiters (login, AI) are added per route.
+ * Local development gets more headroom: hot reloads and automated browser runs make many
+ * requests from one IP. Sensitive routes keep their own strict limits in every environment.
+ */
+export const apiRateLimiter = createRateLimiter({
+  windowMs: 15 * 60 * 1000,
+  limit: isProduction ? 600 : 5000,
+});

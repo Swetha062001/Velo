@@ -9,6 +9,7 @@ import { cn } from '../../utils/cn.ts';
 import { Container } from './Container.tsx';
 import { Logo } from './Logo.tsx';
 import { MobileNav } from './MobileNav.tsx';
+import { SearchDialog } from './SearchDialog.tsx';
 
 function IconLink({ to, label, icon: Icon }: { to: string; label: string; icon: LucideIcon }) {
   return (
@@ -25,6 +26,7 @@ function IconLink({ to, label, icon: Icon }: { to: string; label: string; icon: 
 
 export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const location = useLocation();
   const { data: user } = useCurrentUser();
   const currentUrl = location.pathname + location.search;
@@ -79,7 +81,16 @@ export function Header() {
               Admin
             </Link>
           )}
-          <IconLink to={paths.products} label="Search products" icon={Search} />
+          <button
+            type="button"
+            onClick={() => setSearchOpen(true)}
+            aria-label="Search products"
+            title="Search products"
+            aria-haspopup="dialog"
+            className="inline-flex size-10 items-center justify-center rounded-md transition-colors hover:bg-surface-muted"
+          >
+            <Search aria-hidden className="size-5" strokeWidth={1.75} />
+          </button>
           <span className="hidden sm:contents">
             <IconLink to={paths.wishlist} label="Wishlist" icon={Heart} />
           </span>
@@ -93,6 +104,7 @@ export function Header() {
       </Container>
 
       <MobileNav open={menuOpen} onClose={() => setMenuOpen(false)} />
+      <SearchDialog open={searchOpen} onClose={() => setSearchOpen(false)} />
     </header>
   );
 }

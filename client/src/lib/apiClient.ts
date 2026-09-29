@@ -36,7 +36,17 @@ function buildUrl(path: string, query?: Record<string, QueryValue>) {
   return url;
 }
 
-async function request<T>(method: string, path: string, options: RequestOptions = {}): Promise<T> {
+export interface Envelope<T, M = undefined> {
+  data: T;
+  meta: M;
+}
+
+/** Performs the request and returns the full `{ data, meta }` envelope. */
+async function requestEnvelope<T, M>(
+  method: string,
+  path: string,
+  options: RequestOptions = {},
+): Promise<Envelope<T, M>> {
   const { query, body, signal } = options;
 
   let res: Response;
@@ -56,7 +66,7 @@ async function request<T>(method: string, path: string, options: RequestOptions 
     throw new ApiError(0, 'NETWORK_ERROR', 'Unable to reach the server. Please try again.');
   }
 
-  if (res.status === 204) return undefined as T;
+  if (res.status === 204) return { data: undefined as T, meta: undefined as M };
 
   const payload = await res.json().catch(() => null);
 
@@ -70,12 +80,19 @@ async function request<T>(method: string, path: string, options: RequestOptions 
     );
   }
 
-  return payload?.data as T;
+  return { data: payload?.data as T, meta: payload?.meta as M };
+}
+
+async function request<T>(method: string, path: string, options?: RequestOptions): Promise<T> {
+  return (await requestEnvelope<T, undefined>(method, path, options)).data;
 }
 
 export const api = {
   get: <T>(path: string, options?: Omit<RequestOptions, 'body'>) =>
     request<T>('GET', path, options),
+  /** GET that also returns `meta` (e.g. pagination). */
+  getWithMeta: <T, M>(path: string, options?: Omit<RequestOptions, 'body'>) =>
+    requestEnvelope<T, M>('GET', path, options),
   post: <T>(path: string, body?: unknown, options?: RequestOptions) =>
     request<T>('POST', path, { ...options, body }),
   patch: <T>(path: string, body?: unknown, options?: RequestOptions) =>

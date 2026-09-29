@@ -59,7 +59,8 @@ router.get('/', validate({ query: listProductsQuerySchema }), controller.list);
 
 `validate()` checks params, query and body together, reports every issue at once, and replaces
 them with the **parsed** values (trimmed, coerced, defaulted, unknown keys stripped). Type the
-controller with `Request<Params, unknown, Body, Query>` using `z.infer<>`.
+controller with `Request<Params, unknown, Body>` using `z.infer<>`, and read the query with
+`validatedQuery<T>(req)` (Express types can't see that `req.query` was replaced).
 
 Unknown body keys are stripped — a client can never smuggle in `price`, `role` or `total`.
 

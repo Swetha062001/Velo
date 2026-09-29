@@ -1,4 +1,3 @@
-import { lazy } from 'react';
 import { createBrowserRouter } from 'react-router';
 import { FullPageSpinner } from '../components/common/Spinner.tsx';
 import AccountLayout from '../layouts/AccountLayout.tsx';
@@ -18,20 +17,16 @@ import HomePage from '../pages/home/HomePage.tsx';
 import ProductPage from '../pages/product/ProductPage.tsx';
 import ProductsPage from '../pages/products/ProductsPage.tsx';
 import WishlistPage from '../pages/wishlist/WishlistPage.tsx';
+import {
+  AdminCategoriesPage,
+  AdminDashboardPage,
+  AdminInventoryPage,
+  AdminLayout,
+  AdminOrdersPage,
+  AdminProductsPage,
+  AdminUsersPage,
+} from './adminPages.ts';
 import { GuestOnly, RequireAdmin, RequireAuth } from './guards.tsx';
-
-/*
- * Admin screens use React.lazy (not the router's `lazy`): React.lazy fetches a chunk only
- * when the component renders, so the RequireAdmin guard keeps non-admins from ever
- * downloading admin code. (Router `lazy` loads every matched route before rendering.)
- */
-const AdminLayout = lazy(() => import('../layouts/AdminLayout.tsx'));
-const AdminDashboardPage = lazy(() => import('../pages/admin/AdminDashboardPage.tsx'));
-const AdminProductsPage = lazy(() => import('../pages/admin/AdminProductsPage.tsx'));
-const AdminCategoriesPage = lazy(() => import('../pages/admin/AdminCategoriesPage.tsx'));
-const AdminInventoryPage = lazy(() => import('../pages/admin/AdminInventoryPage.tsx'));
-const AdminOrdersPage = lazy(() => import('../pages/admin/AdminOrdersPage.tsx'));
-const AdminUsersPage = lazy(() => import('../pages/admin/AdminUsersPage.tsx'));
 
 export const router = createBrowserRouter([
   {

@@ -43,7 +43,7 @@ async function runSeed() {
   const summary = await seed(pool);
   console.log(
     `Seeded ${dbName}: ${summary.categories} categories, ${summary.products} products, ` +
-      `${summary.variants} variants, ${summary.users} users.`,
+      `${summary.variants} variants, ${summary.images} images, ${summary.users} users.`,
   );
   console.log('\nDevelopment accounts (local only):');
   for (const { email, password } of Object.values(DEV_ACCOUNTS)) {

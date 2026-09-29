@@ -2,26 +2,31 @@
   {
     "name": "Running",
     "slug": "running",
-    "description": "Responsive cushioning and breathable uppers for daily miles and race day."
+    "description": "Responsive cushioning and breathable uppers for daily miles and race day.",
+    "imageUrl": "https://images.unsplash.com/photo-1542291026-7eec264c27ff"
   },
   {
     "name": "Lifestyle",
     "slug": "lifestyle",
-    "description": "Clean, versatile silhouettes designed for everyday wear."
+    "description": "Clean, versatile silhouettes designed for everyday wear.",
+    "imageUrl": "https://images.unsplash.com/photo-1549298916-b41d501d3772"
   },
   {
     "name": "Training",
     "slug": "training",
-    "description": "Stable, grippy platforms built for the gym floor and cross-training."
+    "description": "Stable, grippy platforms built for the gym floor and cross-training.",
+    "imageUrl": "https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa"
   },
   {
     "name": "Basketball",
     "slug": "basketball",
-    "description": "Court-ready support, traction and impact protection."
+    "description": "Court-ready support, traction and impact protection.",
+    "imageUrl": "https://images.unsplash.com/photo-1575537302964-96cd47c06b1b"
   },
   {
     "name": "Slides & Sandals",
     "slug": "slides",
-    "description": "Easy recovery footwear for off-duty days and warm weather."
+    "description": "Easy recovery footwear for off-duty days and warm weather.",
+    "imageUrl": "https://images.unsplash.com/photo-1529447105779-c529acf6d60b"
   }
 ]

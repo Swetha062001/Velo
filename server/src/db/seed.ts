@@ -24,7 +24,12 @@ const SIZE_RUNS = {
 };
 
 const categorySeedSchema = z.array(
-  z.object({ name: z.string().min(1), slug: slugSchema, description: z.string().min(1) }),
+  z.object({
+    name: z.string().min(1),
+    slug: slugSchema,
+    description: z.string().min(1),
+    imageUrl: z.url(),
+  }),
 );
 
 const productSeedSchema = z.array(
@@ -44,6 +49,7 @@ const productSeedSchema = z.array(
       status: z.enum(['DRAFT', 'ACTIVE', 'ARCHIVED']),
       featured: z.boolean(),
       description: z.string().min(20),
+      images: z.array(z.url()).min(2, 'Each product needs at least 2 images'),
     })
     .refine((p) => p.compareAtPriceInr === null || p.compareAtPriceInr > p.priceInr, {
       message: 'compareAtPriceInr must be greater than priceInr',
@@ -85,6 +91,7 @@ export interface SeedSummary {
   categories: number;
   products: number;
   variants: number;
+  images: number;
   users: number;
 }
 
@@ -105,16 +112,17 @@ export async function seed(pool: Pool): Promise<SeedSummary> {
     const categoryIds = new Map<string, string>();
     for (const [index, c] of categories.entries()) {
       const { rows } = await client.query<{ id: string }>(
-        `INSERT INTO categories (name, slug, description, sort_order)
-         VALUES ($1, $2, $3, $4) RETURNING id`,
-        [c.name, c.slug, c.description, index],
+        `INSERT INTO categories (name, slug, description, image_url, sort_order)
+         VALUES ($1, $2, $3, $4, $5) RETURNING id`,
+        [c.name, c.slug, c.description, c.imageUrl, index],
       );
       categoryIds.set(c.slug, rows[0]!.id);
     }
 
     // Products → variants → inventory
     let variantCount = 0;
-    for (const p of products) {
+    // Stagger creation dates (first product = newest) so "Newest" sorting is meaningful.
+    for (const [productIndex, p] of products.entries()) {
       const categoryId = categoryIds.get(p.category);
       if (!categoryId)
         throw new Error(`Product ${p.slug} references unknown category ${p.category}`);
@@ -122,8 +130,9 @@ export async function seed(pool: Pool): Promise<SeedSummary> {
       const { rows } = await client.query<{ id: string }>(
         `INSERT INTO products
            (category_id, name, slug, description, material, gender, color, colorway, tags,
-            price_paise, compare_at_price_paise, status, is_featured)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+            price_paise, compare_at_price_paise, status, is_featured, created_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13,
+                 now() - make_interval(days => $14))
          RETURNING id`,
         [
           categoryId,
@@ -139,9 +148,18 @@ export async function seed(pool: Pool): Promise<SeedSummary> {
           p.compareAtPriceInr === null ? null : toPaise(p.compareAtPriceInr),
           p.status,
           p.featured,
+          productIndex * 3,
         ],
       );
       const productId = rows[0]!.id;
+
+      for (const [index, url] of p.images.entries()) {
+        await client.query(
+          `INSERT INTO product_images (product_id, url, alt_text, sort_order)
+           VALUES ($1, $2, $3, $4)`,
+          [productId, url, `${p.name} in ${p.colorway}, view ${index + 1}`, index],
+        );
+      }
 
       const sizes = p.gender === 'WOMEN' ? SIZE_RUNS.WOMEN : SIZE_RUNS.default;
       for (const [index, size] of sizes.entries()) {
@@ -182,6 +200,7 @@ export async function seed(pool: Pool): Promise<SeedSummary> {
       categories: categories.length,
       products: products.length,
       variants: variantCount,
+      images: products.reduce((n, p) => n + p.images.length, 0),
       users: 2,
     };
   }, pool);

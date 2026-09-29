@@ -11,7 +11,8 @@ interface RequestSchemas {
 /**
  * Validates and parses request input. Parsed values (with coercion and defaults
  * applied) replace the raw ones, so controllers only ever see validated data.
- * Type controllers with `Request<z.infer<Params>, unknown, z.infer<Body>, z.infer<Query>>`.
+ * Type params/body with `Request<Params, unknown, Body>`; read the query with `validatedQuery()`
+ * (Express's types can't express that `req.query` was replaced).
  *
  * All locations are validated together so the client gets every issue at once.
  */
@@ -52,4 +53,9 @@ export function validate(schemas: RequestSchemas): RequestHandler {
 
     next();
   };
+}
+
+/** The query parsed by `validate({ query })`, typed as the schema's output. */
+export function validatedQuery<T>(req: { query: unknown }): T {
+  return req.query as T;
 }

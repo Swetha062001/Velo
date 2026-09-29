@@ -8,6 +8,8 @@
     text-rendering: optimizeLegibility;
     /* Reserve scrollbar space so locking scroll doesn't shift the layout. */
     scrollbar-gutter: stable;
+    /* Keep focused / scrolled-to elements clear of the sticky 4rem header. */
+    scroll-padding-top: 5rem;
   }
 
   /* Lock page scroll while a modal <dialog> (e.g. mobile nav) is open. */

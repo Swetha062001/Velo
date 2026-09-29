@@ -2,7 +2,7 @@
 
 AI-powered full-stack ecommerce platform for a fictional premium sneaker brand.
 
-> **Status:** Phase 5 — authentication. This README grows with each phase; the complete
+> **Status:** Phase 6 — product catalogue. This README grows with each phase; the complete
 > version (API overview, AI architecture, testing, troubleshooting) lands in Phase 15.
 
 ## Technology stack
@@ -155,6 +155,13 @@ velo/
 
 Backend structure and rules (layers, responses, errors, validation, logging) are documented in
 [`docs/development/backend-conventions.md`](docs/development/backend-conventions.md). Database design: [`docs/database/schema.md`](docs/database/schema.md).
+
+## Image credits
+
+Demo product and category photography is loaded from [Unsplash](https://unsplash.com) under the
+[Unsplash License](https://unsplash.com/license). VELO is a fictional brand; some photos show
+real third-party products and logos and are used purely as placeholder imagery for this portfolio
+project. Replace them with original photography before any real use.
 
 ## Deployment
 
