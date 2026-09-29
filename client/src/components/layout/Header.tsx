@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Link, useLocation } from 'react-router';
 import { storefrontNav } from '../../config/navigation.ts';
 import { useCurrentUser } from '../../hooks/useAuth.ts';
+import { useCart } from '../../hooks/useCart.ts';
 import { paths } from '../../routes/paths.ts';
 import { cn } from '../../utils/cn.ts';
 import { Container } from './Container.tsx';
@@ -29,6 +30,8 @@ export function Header() {
   const [searchOpen, setSearchOpen] = useState(false);
   const location = useLocation();
   const { data: user } = useCurrentUser();
+  const { cart } = useCart();
+  const bagCount = cart?.itemCount ?? 0;
   const currentUrl = location.pathname + location.search;
 
   return (
@@ -99,7 +102,22 @@ export function Header() {
             label={user ? `Account — ${user.name}` : 'Sign in'}
             icon={User}
           />
-          <IconLink to={paths.cart} label="Cart" icon={ShoppingBag} />
+          <Link
+            to={paths.cart}
+            aria-label={bagCount ? `Bag, ${bagCount} ${bagCount === 1 ? 'item' : 'items'}` : 'Bag'}
+            title="Bag"
+            className="relative inline-flex size-10 items-center justify-center rounded-md transition-colors hover:bg-surface-muted"
+          >
+            <ShoppingBag aria-hidden className="size-5" strokeWidth={1.75} />
+            {bagCount > 0 && (
+              <span
+                aria-hidden
+                className="absolute top-1 right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent px-1 text-[0.625rem] leading-none font-bold text-accent-fg tabular-nums"
+              >
+                {bagCount > 99 ? '99+' : bagCount}
+              </span>
+            )}
+          </Link>
         </div>
       </Container>
 

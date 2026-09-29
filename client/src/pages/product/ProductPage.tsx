@@ -14,11 +14,14 @@ import { ProductGallery } from '../../components/product/ProductGallery.tsx';
 import { ProductGrid } from '../../components/product/ProductGrid.tsx';
 import { ProductImage } from '../../components/product/ProductImage.tsx';
 import { SizeSelector } from '../../components/product/SizeSelector.tsx';
+import { useAddToCart } from '../../hooks/useCart.ts';
 import { useProduct } from '../../hooks/useCatalog.ts';
 import { ApiError } from '../../lib/apiClient.ts';
 import { paths, productsUrl } from '../../routes/paths.ts';
+import { useUi } from '../../store/ui.ts';
 import type { ProductDetail } from '../../types/catalog.ts';
 import { cn } from '../../utils/cn.ts';
+import { errorMessage } from '../../utils/forms.ts';
 
 const GENDER_LABEL = { MEN: 'Men', WOMEN: 'Women', UNISEX: 'Unisex' } as const;
 
@@ -59,19 +62,19 @@ function ProductSkeleton() {
 
 function PurchasePanel({ product }: { product: ProductDetail }) {
   const [variantId, setVariantId] = useState<string | null>(null);
-  const [error, setError] = useState<string>();
-  const [notice, setNotice] = useState(false);
+  const [sizeError, setSizeError] = useState<string>();
+  const addToCart = useAddToCart();
+  const openCartDrawer = useUi((s) => s.openCartDrawer);
 
-  const variant = product.variants.find((v) => v.id === variantId);
   const soldOut = !product.inStock;
 
   function handleAdd() {
-    if (!variant) {
-      setError('Please select a size.');
+    if (!variantId) {
+      setSizeError('Please select a size.');
       return;
     }
-    setError(undefined);
-    setNotice(true); // Cart is wired up in Phase 7.
+    setSizeError(undefined);
+    addToCart.mutate({ variantId, quantity: 1 }, { onSuccess: openCartDrawer });
   }
 
   return (
@@ -81,21 +84,23 @@ function PurchasePanel({ product }: { product: ProductDetail }) {
         selectedId={variantId}
         onSelect={(id) => {
           setVariantId(id);
-          setError(undefined);
-          setNotice(false);
+          setSizeError(undefined);
+          addToCart.reset();
         }}
-        error={error}
+        error={sizeError}
       />
 
-      <Button size="lg" fullWidth disabled={soldOut} onClick={handleAdd}>
+      <Button
+        size="lg"
+        fullWidth
+        disabled={soldOut}
+        loading={addToCart.isPending}
+        onClick={handleAdd}
+      >
         {soldOut ? 'Sold out' : 'Add to bag'}
       </Button>
 
-      {notice && variant && (
-        <Alert tone="info">
-          {variant.sizeLabel} selected. The shopping bag is coming in the next phase.
-        </Alert>
-      )}
+      {addToCart.isError && <Alert tone="danger">{errorMessage(addToCart.error)}</Alert>}
     </div>
   );
 }
@@ -231,7 +236,7 @@ export default function ProductPage() {
 
             <ul className="mt-8 grid gap-3 border-y border-line py-6 text-sm">
               {[
-                { icon: Truck, text: 'Free shipping on orders over ₹2,999' },
+                { icon: Truck, text: 'Free shipping on orders of ₹2,999 or more' },
                 { icon: RotateCcw, text: '30-day returns on unworn pairs' },
                 { icon: ShieldCheck, text: 'Secure checkout' },
               ].map(({ icon: Icon, text }) => (
@@ -254,8 +259,8 @@ export default function ProductPage() {
               </Disclosure>
               <Disclosure title="Shipping & returns">
                 <p>
-                  Orders over ₹2,999 ship free; otherwise a flat ₹99. Unworn pairs can be returned
-                  within 30 days.
+                  Orders of ₹2,999 or more ship free; otherwise a flat ₹99. Unworn pairs can be
+                  returned within 30 days.
                 </p>
               </Disclosure>
             </div>

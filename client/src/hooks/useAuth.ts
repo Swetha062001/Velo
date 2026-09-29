@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { mergeGuestCartIntoAccount } from '../lib/cartSync.ts';
 import { authService } from '../services/auth.service.ts';
 import type { User } from '../types/user.ts';
 
@@ -21,18 +22,31 @@ function useSetCurrentUser() {
   return (user: User) => queryClient.setQueryData(authKeys.me, user);
 }
 
+/**
+ * After sign-in: move any guest bag into the account FIRST (the session cookie is already
+ * set), then mark the user signed in. The reverse order would start a cart fetch that could
+ * resolve after the merge and overwrite it with the pre-merge cart.
+ */
+function useSessionStart() {
+  const queryClient = useQueryClient();
+  return async (user: User) => {
+    await mergeGuestCartIntoAccount(queryClient);
+    queryClient.setQueryData(authKeys.me, user);
+  };
+}
+
 export function useLogin() {
-  const setUser = useSetCurrentUser();
+  const startSession = useSessionStart();
   return useMutation({
     mutationFn: authService.login,
-    onSuccess: setUser,
+    onSuccess: startSession,
     meta: { ignoreUnauthorized: true }, // wrong password → 401, not a lost session
   });
 }
 
 export function useRegister() {
-  const setUser = useSetCurrentUser();
-  return useMutation({ mutationFn: authService.register, onSuccess: setUser });
+  const startSession = useSessionStart();
+  return useMutation({ mutationFn: authService.register, onSuccess: startSession });
 }
 
 export function useLogout() {

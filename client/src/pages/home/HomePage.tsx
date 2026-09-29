@@ -11,7 +11,7 @@ import { useCategories, useProducts } from '../../hooks/useCatalog.ts';
 import { paths, productsUrl } from '../../routes/paths.ts';
 
 const valueProps = [
-  { icon: Truck, title: 'Free shipping over ₹2,999', text: 'Flat ₹99 on smaller orders.' },
+  { icon: Truck, title: 'Free shipping from ₹2,999', text: 'Flat ₹99 on smaller orders.' },
   { icon: RotateCcw, title: '30-day returns', text: 'Unworn pairs, no questions asked.' },
   { icon: Sparkles, title: 'AI shopping assistant', text: 'Describe it — we find the pair.' },
 ];

@@ -1,4 +1,5 @@
 import { Outlet } from 'react-router';
+import { CartDrawer } from '../components/cart/CartDrawer.tsx';
 import { Footer } from '../components/layout/Footer.tsx';
 import { Header } from '../components/layout/Header.tsx';
 import { SkipLink } from '../components/layout/SkipLink.tsx';
@@ -12,6 +13,7 @@ export default function StorefrontLayout() {
         <Outlet />
       </main>
       <Footer />
+      <CartDrawer />
     </div>
   );
 }

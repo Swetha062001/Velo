@@ -2,17 +2,17 @@
 
 AI-powered full-stack ecommerce platform for a fictional premium sneaker brand.
 
-> **Status:** Phase 6 — product catalogue. This README grows with each phase; the complete
+> **Status:** Phase 7 — cart. This README grows with each phase; the complete
 > version (API overview, AI architecture, testing, troubleshooting) lands in Phase 15.
 
 ## Technology stack
 
-| Layer    | Tech                                                                                                    |
-| -------- | ------------------------------------------------------------------------------------------------------- |
-| Client   | React 19, TypeScript, Vite, Tailwind CSS v4, React Router, TanStack Query, React Hook Form, Zod, Lucide |
-| Server   | Node.js, Express 5, TypeScript, Zod, Helmet, CORS, express-rate-limit, jsonwebtoken, cookie-parser      |
-| Database | PostgreSQL 13+ (local), node-postgres (`pg`), plain SQL migrations, bcryptjs                            |
-| Tooling  | npm workspaces, ESLint (flat config), Prettier, tsx, concurrently, Vitest, Supertest                    |
+| Layer    | Tech                                                                                                             |
+| -------- | ---------------------------------------------------------------------------------------------------------------- |
+| Client   | React 19, TypeScript, Vite, Tailwind CSS v4, React Router, TanStack Query, Zustand, React Hook Form, Zod, Lucide |
+| Server   | Node.js, Express 5, TypeScript, Zod, Helmet, CORS, express-rate-limit, jsonwebtoken, cookie-parser               |
+| Database | PostgreSQL 13+ (local), node-postgres (`pg`), plain SQL migrations, bcryptjs                                     |
+| Tooling  | npm workspaces, ESLint (flat config), Prettier, tsx, concurrently, Vitest, Supertest                             |
 
 ## Prerequisites
 
@@ -117,6 +117,18 @@ Further variables (AI, image storage) are added and documented in the phase that
 - Sign-in failures return one generic message; failed attempts are rate-limited.
 
 API reference: [`docs/api/`](docs/api/README.md).
+
+## Cart & pricing
+
+- **Server-calculated everything.** Clients send variant ids and quantities; the API returns line
+  prices, subtotal, shipping (free from ₹2,999, otherwise ₹99) and total. Carts never store prices.
+- **Guest bag** — signed-out shoppers' bags live in `localStorage` (ids + quantities only, via a
+  small Zustand store) and are priced with `POST /cart/quote`. On sign-in the bag is merged into
+  the account cart (`POST /cart/merge`) and cleared.
+- **Stock-aware** — every add/update is checked against inventory; lines that become sold out or
+  exceed stock are flagged and excluded from totals until fixed. Stock is reserved only at checkout.
+
+Rules live in `server/src/config/commerce.ts`; pricing logic in `server/src/modules/cart/cart.pricing.ts`.
 
 ## Theme
 

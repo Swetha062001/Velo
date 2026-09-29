@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { adminRouter } from './modules/admin/admin.routes.js';
 import { authRouter } from './modules/auth/auth.routes.js';
+import { cartRouter } from './modules/cart/cart.routes.js';
 import { categoriesRouter } from './modules/categories/categories.routes.js';
 import { healthRouter } from './modules/health/health.routes.js';
 import { productsRouter } from './modules/products/products.routes.js';
@@ -14,4 +15,5 @@ apiRouter.use('/auth', authRouter);
 apiRouter.use('/users', usersRouter);
 apiRouter.use('/categories', categoriesRouter);
 apiRouter.use('/products', productsRouter);
+apiRouter.use('/cart', cartRouter);
 apiRouter.use('/admin', adminRouter);
