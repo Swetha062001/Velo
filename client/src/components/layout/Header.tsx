@@ -1,5 +1,5 @@
 import type { LucideIcon } from 'lucide-react';
-import { Heart, Menu, Search, ShoppingBag, User } from 'lucide-react';
+import { Heart, LayoutDashboard, Menu, Search, ShoppingBag, User } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router';
 import { storefrontNav } from '../../config/navigation.ts';
@@ -93,9 +93,10 @@ export function Header() {
           {user?.role === 'ADMIN' && (
             <Link
               to={paths.admin}
-              className="mr-2 hidden rounded-xs bg-accent-soft px-2 py-1 text-xs font-semibold tracking-wide text-accent uppercase transition-colors hover:bg-accent hover:text-accent-fg sm:inline-block"
+              className="mr-2 hidden h-9 items-center gap-1.5 rounded-md bg-inverse px-3 text-xs font-semibold text-inverse-fg transition-colors hover:bg-accent hover:text-accent-fg sm:inline-flex"
             >
-              Admin
+              <LayoutDashboard aria-hidden className="size-4" />
+              Admin dashboard
             </Link>
           )}
           <button

@@ -2,7 +2,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router';
 import { AuthShell } from '../../components/auth/AuthShell.tsx';
 import { LoginForm } from '../../components/auth/LoginForm.tsx';
 import { paths } from '../../routes/paths.ts';
-import { safeRedirect } from '../../utils/redirect.ts';
+import { homeFor, safeRedirect } from '../../utils/redirect.ts';
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -29,7 +29,11 @@ export default function LoginPage() {
         </>
       }
     >
-      <LoginForm onSuccess={() => navigate(safeRedirect(redirect), { replace: true })} />
+      <LoginForm
+        onSuccess={(user) =>
+          navigate(safeRedirect(redirect, homeFor(user.role)), { replace: true })
+        }
+      />
     </AuthShell>
   );
 }

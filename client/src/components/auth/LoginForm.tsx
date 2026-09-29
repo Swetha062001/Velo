@@ -2,13 +2,14 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { useLogin } from '../../hooks/useAuth.ts';
 import { loginSchema, type LoginValues } from '../../schemas/auth.schemas.ts';
+import type { User } from '../../types/user.ts';
 import { applyServerErrors, errorMessage } from '../../utils/forms.ts';
 import { Alert } from '../common/Alert.tsx';
 import { Button } from '../common/Button.tsx';
 import { Input } from '../common/Input.tsx';
 import { PasswordInput } from '../common/PasswordInput.tsx';
 
-export function LoginForm({ onSuccess }: { onSuccess: () => void }) {
+export function LoginForm({ onSuccess }: { onSuccess: (user: User) => void }) {
   const login = useLogin();
   const {
     register,

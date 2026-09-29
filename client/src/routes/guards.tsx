@@ -4,7 +4,7 @@ import { ErrorState } from '../components/common/ErrorState.tsx';
 import { FullPageSpinner } from '../components/common/Spinner.tsx';
 import { useCurrentUser } from '../hooks/useAuth.ts';
 import ForbiddenPage from '../pages/errors/ForbiddenPage.tsx';
-import { loginUrl, safeRedirect } from '../utils/redirect.ts';
+import { homeFor, loginUrl, safeRedirect } from '../utils/redirect.ts';
 
 /*
  * Route guards are a UX layer only: they decide what to render. Every protected API
@@ -51,6 +51,7 @@ export function GuestOnly() {
   const [params] = useSearchParams();
 
   if (status === 'loading') return <FullPageSpinner />;
-  if (user) return <Navigate to={safeRedirect(params.get('redirect'))} replace />;
+  if (user)
+    return <Navigate to={safeRedirect(params.get('redirect'), homeFor(user.role))} replace />;
   return <Outlet />;
 }

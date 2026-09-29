@@ -1,4 +1,5 @@
 import { paths } from '../routes/paths.ts';
+import type { Role } from '../types/user.ts';
 
 /**
  * Returns a safe in-app path from a `?redirect=` value, or the fallback.
@@ -16,4 +17,9 @@ export function safeRedirect(value: string | null, fallback: string = paths.acco
 /** Sign-in URL that returns the user to `from` afterwards. */
 export function loginUrl(from: string) {
   return `${paths.login}?redirect=${encodeURIComponent(from)}`;
+}
+
+/** Where to go after signing in when no specific page was requested. */
+export function homeFor(role: Role | undefined) {
+  return role === 'ADMIN' ? paths.admin : paths.account;
 }

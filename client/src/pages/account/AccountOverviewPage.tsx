@@ -2,9 +2,11 @@ import type { ReactNode } from 'react';
 import { ChangePasswordForm } from '../../components/account/ChangePasswordForm.tsx';
 import { ProfileForm } from '../../components/account/ProfileForm.tsx';
 import { Badge } from '../../components/common/Badge.tsx';
+import { ButtonLink } from '../../components/common/Button.tsx';
 import { DocumentTitle } from '../../components/common/DocumentTitle.tsx';
 import { useCurrentUser } from '../../hooks/useAuth.ts';
 import { formatDate } from '../../utils/format.ts';
+import { paths } from '../../routes/paths.ts';
 
 function Section({
   title,
@@ -41,6 +43,17 @@ export default function AccountOverviewPage() {
           {user.role === 'ADMIN' && <Badge tone="accent">Admin</Badge>}
         </div>
         <p className="mt-2 text-sm text-ink-muted">Member since {formatDate(user.createdAt)}</p>
+        {user.role === 'ADMIN' && (
+          <div className="mt-6 flex flex-wrap items-center justify-between gap-4 rounded-lg border border-line bg-surface p-5">
+            <div>
+              <p className="text-sm font-semibold">You have admin access</p>
+              <p className="text-sm text-ink-muted">
+                Manage products, orders, inventory and customers, and see revenue.
+              </p>
+            </div>
+            <ButtonLink to={paths.admin}>Go to admin dashboard</ButtonLink>
+          </div>
+        )}
       </header>
 
       <Section title="Profile" description="Your name as it appears on orders and emails.">
