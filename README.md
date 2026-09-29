@@ -2,17 +2,17 @@
 
 AI-powered full-stack ecommerce platform for a fictional premium sneaker brand.
 
-> **Status:** Phase 1 — project foundation. This README grows with each phase; the complete
+> **Status:** Phase 2 — frontend foundation. This README grows with each phase; the complete
 > version (API overview, AI architecture, testing, troubleshooting) lands in Phase 15.
 
 ## Technology stack
 
-| Layer    | Tech                                                              |
-| -------- | ----------------------------------------------------------------- |
-| Client   | React 19, TypeScript, Vite, Tailwind CSS v4                       |
-| Server   | Node.js, Express 5, TypeScript, Zod, Helmet, CORS                 |
-| Database | PostgreSQL (local) — added in Phase 4                             |
-| Tooling  | npm workspaces, ESLint (flat config), Prettier, tsx, concurrently |
+| Layer    | Tech                                                                              |
+| -------- | --------------------------------------------------------------------------------- |
+| Client   | React 19, TypeScript, Vite, Tailwind CSS v4, React Router, TanStack Query, Lucide |
+| Server   | Node.js, Express 5, TypeScript, Zod, Helmet, CORS                                 |
+| Database | PostgreSQL (local) — added in Phase 4                                             |
+| Tooling  | npm workspaces, ESLint (flat config), Prettier, tsx, concurrently                 |
 
 ## Prerequisites
 
@@ -83,6 +83,21 @@ utilities only — `bg-canvas`, `bg-surface`, `text-ink`, `text-ink-muted`, `bor
 `bg-accent`, `bg-inverse`, `text-danger`, etc. Tailwind's default palette is intentionally reset, so
 off-brand classes such as `bg-blue-500` do not exist. A dark palette is already defined behind
 `<html data-theme="dark">`.
+
+Shared UI primitives live in `client/src/components/common/` — `Button` / `ButtonLink`, `Input`,
+`Badge`, `Spinner`, `Skeleton`, `EmptyState`, `ErrorState`. Build new UI from these rather than
+restyling raw elements.
+
+## Frontend architecture
+
+| Concern      | Location                                                                         |
+| ------------ | -------------------------------------------------------------------------------- |
+| Routes       | `client/src/routes/router.tsx` (admin is lazy-loaded); URLs in `routes/paths.ts` |
+| Layouts      | `client/src/layouts/` — Root, Storefront, Account, Admin                         |
+| API calls    | `client/src/lib/apiClient.ts` (fetch wrapper, cookies, typed `ApiError`)         |
+| Server state | TanStack Query — `lib/queryClient.ts`; feature calls in `services/` + `hooks/`   |
+| Navigation   | `client/src/config/navigation.ts`                                                |
+| Page titles  | `<DocumentTitle>` — one per page (React 19 hoists `<title>`)                     |
 
 ## Project structure
 

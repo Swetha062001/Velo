@@ -6,6 +6,13 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
+    /* Reserve scrollbar space so locking scroll doesn't shift the layout. */
+    scrollbar-gutter: stable;
+  }
+
+  /* Lock page scroll while a modal <dialog> (e.g. mobile nav) is open. */
+  html:has(dialog[open]:modal) {
+    overflow: hidden;
   }
 
   body {
