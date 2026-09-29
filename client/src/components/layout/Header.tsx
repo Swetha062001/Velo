@@ -5,6 +5,7 @@ import { Link, useLocation } from 'react-router';
 import { storefrontNav } from '../../config/navigation.ts';
 import { useCurrentUser } from '../../hooks/useAuth.ts';
 import { useCart } from '../../hooks/useCart.ts';
+import { useWishlist } from '../../hooks/useWishlist.ts';
 import { paths } from '../../routes/paths.ts';
 import { cn } from '../../utils/cn.ts';
 import { Container } from './Container.tsx';
@@ -25,6 +26,17 @@ function IconLink({ to, label, icon: Icon }: { to: string; label: string; icon: 
   );
 }
 
+function CountBadge({ count }: { count: number }) {
+  return (
+    <span
+      aria-hidden
+      className="absolute top-1 right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent px-1 text-[0.625rem] leading-none font-bold text-accent-fg tabular-nums"
+    >
+      {count > 99 ? '99+' : count}
+    </span>
+  );
+}
+
 export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -32,6 +44,8 @@ export function Header() {
   const { data: user } = useCurrentUser();
   const { cart } = useCart();
   const bagCount = cart?.itemCount ?? 0;
+  const { data: wishlist } = useWishlist();
+  const wishlistCount = user ? (wishlist?.count ?? 0) : 0;
   const currentUrl = location.pathname + location.search;
 
   return (
@@ -94,9 +108,15 @@ export function Header() {
           >
             <Search aria-hidden className="size-5" strokeWidth={1.75} />
           </button>
-          <span className="hidden sm:contents">
-            <IconLink to={paths.wishlist} label="Wishlist" icon={Heart} />
-          </span>
+          <Link
+            to={paths.wishlist}
+            aria-label={wishlistCount ? `Wishlist, ${wishlistCount} saved` : 'Wishlist'}
+            title="Wishlist"
+            className="relative hidden size-10 items-center justify-center rounded-md transition-colors hover:bg-surface-muted sm:inline-flex"
+          >
+            <Heart aria-hidden className="size-5" strokeWidth={1.75} />
+            {wishlistCount > 0 && <CountBadge count={wishlistCount} />}
+          </Link>
           <IconLink
             to={user ? paths.account : paths.login}
             label={user ? `Account — ${user.name}` : 'Sign in'}
@@ -109,14 +129,7 @@ export function Header() {
             className="relative inline-flex size-10 items-center justify-center rounded-md transition-colors hover:bg-surface-muted"
           >
             <ShoppingBag aria-hidden className="size-5" strokeWidth={1.75} />
-            {bagCount > 0 && (
-              <span
-                aria-hidden
-                className="absolute top-1 right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent px-1 text-[0.625rem] leading-none font-bold text-accent-fg tabular-nums"
-              >
-                {bagCount > 99 ? '99+' : bagCount}
-              </span>
-            )}
+            {bagCount > 0 && <CountBadge count={bagCount} />}
           </Link>
         </div>
       </Container>

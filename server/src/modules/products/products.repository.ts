@@ -52,16 +52,16 @@ export interface VariantRow {
 }
 
 /** Only live products in live categories are ever visible to shoppers. */
-const VISIBLE = `p.status = 'ACTIVE' AND c.is_active`;
+export const VISIBLE = `p.status = 'ACTIVE' AND c.is_active`;
 
-const SUMMARY_COLUMNS = `
+export const SUMMARY_COLUMNS = `
   p.id, p.slug, p.name, p.colorway, p.color, p.gender,
   p.price_paise, p.compare_at_price_paise, p.is_featured,
   c.slug AS category_slug, c.name AS category_name,
   COALESCE(stock.in_stock, false) AS in_stock,
   COALESCE(img.images, '[]'::jsonb) AS images`;
 
-const SUMMARY_JOINS = `
+export const SUMMARY_JOINS = `
   JOIN categories c ON c.id = p.category_id
   LEFT JOIN LATERAL (
     SELECT bool_or(v.is_active AND i.quantity > 0) AS in_stock

@@ -65,7 +65,7 @@ export function toSummary(row: ProductSummaryRow): ProductSummary {
   };
 }
 
-function toVariant(row: VariantRow): ProductVariant {
+export function toVariant(row: VariantRow): ProductVariant {
   return {
     id: row.id,
     sizeLabel: row.size_label,

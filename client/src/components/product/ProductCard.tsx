@@ -4,6 +4,7 @@ import type { ProductSummary } from '../../types/catalog.ts';
 import { discountPercent } from '../../utils/money.ts';
 import { cn } from '../../utils/cn.ts';
 import { Badge } from '../common/Badge.tsx';
+import { WishlistButton } from '../wishlist/WishlistButton.tsx';
 import { Price } from './Price.tsx';
 import { ProductImage } from './ProductImage.tsx';
 
@@ -51,6 +52,8 @@ export function ProductCard({ product, priority = false }: ProductCardProps) {
             VELO
           </div>
         )}
+
+        <WishlistButton product={product} />
 
         <div className="absolute top-3 left-3 flex flex-col items-start gap-1.5">
           {!product.inStock && <Badge>Sold out</Badge>}

@@ -2,7 +2,7 @@
 
 AI-powered full-stack ecommerce platform for a fictional premium sneaker brand.
 
-> **Status:** Phase 7 — cart. This README grows with each phase; the complete
+> **Status:** Phase 8 — wishlist. This README grows with each phase; the complete
 > version (API overview, AI architecture, testing, troubleshooting) lands in Phase 15.
 
 ## Technology stack
@@ -118,7 +118,7 @@ Further variables (AI, image storage) are added and documented in the phase that
 
 API reference: [`docs/api/`](docs/api/README.md).
 
-## Cart & pricing
+## Cart, pricing & wishlist
 
 - **Server-calculated everything.** Clients send variant ids and quantities; the API returns line
   prices, subtotal, shipping (free from ₹2,999, otherwise ₹99) and total. Carts never store prices.
@@ -127,6 +127,10 @@ API reference: [`docs/api/`](docs/api/README.md).
   the account cart (`POST /cart/merge`) and cleared.
 - **Stock-aware** — every add/update is checked against inventory; lines that become sold out or
   exceed stock are flagged and excluded from totals until fixed. Stock is reserved only at checkout.
+
+**Wishlist** — signed-in only. Hearts on product cards and pages save instantly (optimistic, rolled
+back on failure). A guest who taps a heart signs in and the product is then saved automatically.
+"Move to bag" asks for a size and uses the same stock rules as the cart.
 
 Rules live in `server/src/config/commerce.ts`; pricing logic in `server/src/modules/cart/cart.pricing.ts`.
 

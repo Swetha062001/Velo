@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { mergeGuestCartIntoAccount } from '../lib/cartSync.ts';
+import { applyWishlistIntent } from '../lib/wishlistIntent.ts';
 import { authService } from '../services/auth.service.ts';
 import type { User } from '../types/user.ts';
 
@@ -23,14 +24,14 @@ function useSetCurrentUser() {
 }
 
 /**
- * After sign-in: move any guest bag into the account FIRST (the session cookie is already
- * set), then mark the user signed in. The reverse order would start a cart fetch that could
- * resolve after the merge and overwrite it with the pre-merge cart.
+ * After sign-in: move any guest bag (and a pending wishlist save) into the account FIRST —
+ * the session cookie is already set — then mark the user signed in. The reverse order would
+ * start a cart fetch that could resolve after the merge and overwrite it with the old cart.
  */
 function useSessionStart() {
   const queryClient = useQueryClient();
   return async (user: User) => {
-    await mergeGuestCartIntoAccount(queryClient);
+    await Promise.all([mergeGuestCartIntoAccount(queryClient), applyWishlistIntent(queryClient)]);
     queryClient.setQueryData(authKeys.me, user);
   };
 }

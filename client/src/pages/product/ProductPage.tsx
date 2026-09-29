@@ -14,6 +14,7 @@ import { ProductGallery } from '../../components/product/ProductGallery.tsx';
 import { ProductGrid } from '../../components/product/ProductGrid.tsx';
 import { ProductImage } from '../../components/product/ProductImage.tsx';
 import { SizeSelector } from '../../components/product/SizeSelector.tsx';
+import { WishlistButton } from '../../components/wishlist/WishlistButton.tsx';
 import { useAddToCart } from '../../hooks/useCart.ts';
 import { useProduct } from '../../hooks/useCatalog.ts';
 import { ApiError } from '../../lib/apiClient.ts';
@@ -90,15 +91,18 @@ function PurchasePanel({ product }: { product: ProductDetail }) {
         error={sizeError}
       />
 
-      <Button
-        size="lg"
-        fullWidth
-        disabled={soldOut}
-        loading={addToCart.isPending}
-        onClick={handleAdd}
-      >
-        {soldOut ? 'Sold out' : 'Add to bag'}
-      </Button>
+      <div className="flex gap-3">
+        <Button
+          size="lg"
+          fullWidth
+          disabled={soldOut}
+          loading={addToCart.isPending}
+          onClick={handleAdd}
+        >
+          {soldOut ? 'Sold out' : 'Add to bag'}
+        </Button>
+        <WishlistButton product={product} variant="inline" />
+      </div>
 
       {addToCart.isError && <Alert tone="danger">{errorMessage(addToCart.error)}</Alert>}
     </div>
