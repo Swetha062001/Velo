@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: velo-api
+    runtime: node
+    plan: free
+    buildCommand: npm ci && npm run build --workspace server
+    startCommand: npm run start --workspace server
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: AI_PROVIDER
+        value: mock
+      - key: PUBLIC_SERVER_URL
+        value: https://velo-api.onrender.com
+      - key: CORS_ORIGIN
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        sync: false
